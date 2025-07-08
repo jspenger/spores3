@@ -1,4 +1,4 @@
-package sporks.jvm
+package spores.jvm
 
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -7,14 +7,14 @@ import org.junit.Assert.*
 
 import upickle.default.*
 
-import sporks.*
-import sporks.given
-import sporks.TestUtils.*
+import spores.*
+import spores.given
+import spores.TestUtils.*
 
 
 object AutoCaptureErrorTests {
 
-  /** Foo values cannot be captured as there is no Spork[ReadWriter[Foo]]]. */
+  /** Foo values cannot be captured as there is no Spore[ReadWriter[Foo]]]. */
   case class Foo(x: Int, y: Int)
 
   /** Opaque type without a ReadWriter. */
@@ -50,7 +50,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `foo`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `foo`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -62,7 +62,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `foo`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `foo`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -74,7 +74,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `foo`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `foo`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -89,7 +89,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `A`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `A`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -101,7 +101,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `A`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `A`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -116,7 +116,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `captureMeIfYouCan`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `captureMeIfYouCan`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -132,7 +132,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `AutoCaptureErrorTests`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `AutoCaptureErrorTests`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -143,7 +143,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `AutoCaptureErrorTests`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `AutoCaptureErrorTests`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -154,7 +154,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `AutoCaptureErrorTests`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `AutoCaptureErrorTests`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -165,12 +165,12 @@ class AutoCaptureErrorTests {
         """
         case class Bar(x: Int, y: Int)
         given ReadWriter[Bar] = macroRW[Bar]
-        given Spork[ReadWriter[Bar]] = spauto { summon[ReadWriter[Bar]] }
+        given Spore[ReadWriter[Bar]] = spauto { summon[ReadWriter[Bar]] }
         """
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `given_ReadWriter_Bar`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `given_ReadWriter_Bar`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -185,7 +185,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `opaqueInt`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `opaqueInt`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -204,7 +204,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Inner`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Inner`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -220,7 +220,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Outer`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Outer`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -236,7 +236,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Outer`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Outer`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -255,7 +255,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `foo`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `foo`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -272,7 +272,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -286,7 +286,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -303,7 +303,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar0`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar0`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -317,7 +317,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar1`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar1`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -331,7 +331,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar2`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar2`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -346,7 +346,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar3`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar3`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
 
     assertTrue:
@@ -360,7 +360,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar4`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar4`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -377,7 +377,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -394,7 +394,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -409,7 +409,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -428,7 +428,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Baz`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Baz`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 
@@ -444,7 +444,7 @@ class AutoCaptureErrorTests {
       .exists:
         _.matches:
           raw"""
-          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type sporks.Spork\[\s*upickle.default.ReadWriter\[.*\]\]\s*
+          (?s)Missing implicit for captured variable `Bar`\.\R\Rno implicit values were found that match type spores.Spore\[\s*upickle.default.ReadWriter\[.*\]\]\s*
           """.trim()
   }
 }

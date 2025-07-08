@@ -1,4 +1,4 @@
-package sporks
+package spores
 
 
 trait Duplicable[T] {
@@ -23,8 +23,8 @@ object Duplicable {
   given Duplicable[Char] =    new Duplicable[Char] { def duplicate(value: Char): Char = value }
   given Duplicable[Unit] =    new Duplicable[Unit] { def duplicate(value: Unit): Unit = value }
 
-  given [T]: Duplicable[Spork[T]] = new Duplicable[Spork[T]] {
-    def duplicate(value: Spork[T]): Spork[T] = value
+  given [T]: Duplicable[Spore[T]] = new Duplicable[Spore[T]] {
+    def duplicate(value: Spore[T]): Spore[T] = value
   }
 
 }

@@ -1,29 +1,29 @@
-package sporks
+package spores
 
 import upickle.default.*
 
-import sporks.*
-import sporks.Packed.*
+import spores.*
+import spores.Packed.*
 
 
-/** A collection of ReadWriters. Contains both `ReadWriter[Spork[T]]` and
-  * `Spork[ReadWriter[T]]` for various `T`.
+/** A collection of ReadWriters. Contains both `ReadWriter[Spore[T]]` and
+  * `Spore[ReadWriter[T]]` for various `T`.
   *
-  * Use `ReadWriter[Spork[T]]` to serialize and deserialize Sporks. For example,
+  * Use `ReadWriter[Spore[T]]` to serialize and deserialize Spores. For example,
   * by using the `upickle.default.write` and `upickle.default.read` methods
-  * applied to a `Spork[T]`.
+  * applied to a `Spore[T]`.
   *
-  * Use `Spork[ReadWriter[T]]` when packing a value of type `T` into a Spork.
-  * For example, by using the `withEnv` and `withCtx` methods of a `Spork[T =>
-  * R]` or `Spork[T ?=> R]`.
+  * Use `Spore[ReadWriter[T]]` when packing a value of type `T` into a Spore.
+  * For example, by using the `withEnv` and `withCtx` methods of a `Spore[T =>
+  * R]` or `Spore[T ?=> R]`.
   */
 object ReadWriters {
 
   //////////////////////////////////////////////////////////////////////////////
-  // ReadWriter[Spork[T]]
+  // ReadWriter[Spore[T]]
   //////////////////////////////////////////////////////////////////////////////
 
-  given [T]: ReadWriter[Spork[T]]  = macroRW
+  given [T]: ReadWriter[Spore[T]]  = macroRW
   given [T]: ReadWriter[PackedObject[T]] = macroRW
   given [T]: ReadWriter[PackedClass[T]]  = macroRW
   given [T]: ReadWriter[PackedLambda[T]] = macroRW
@@ -32,90 +32,90 @@ object ReadWriters {
   given [E, T]: ReadWriter[PackedWithCtx[E, T]] = macroRW
 
   //////////////////////////////////////////////////////////////////////////////
-  // Spork[ReadWriter[T]] for primitive T
+  // Spore[ReadWriter[T]] for primitive T
   //////////////////////////////////////////////////////////////////////////////
 
-  private[sporks] object IntRW extends SporkBuilder[ReadWriter[Int]](summon[ReadWriter[Int]])
-  given intRW: Spork[ReadWriter[Int]] = IntRW.pack()
+  private[spores] object IntRW extends SporeBuilder[ReadWriter[Int]](summon[ReadWriter[Int]])
+  given intRW: Spore[ReadWriter[Int]] = IntRW.pack()
 
-  private[sporks] object StringRW extends SporkBuilder[ReadWriter[String]](summon[ReadWriter[String]])
-  given strRW: Spork[ReadWriter[String]] = StringRW.pack()
+  private[spores] object StringRW extends SporeBuilder[ReadWriter[String]](summon[ReadWriter[String]])
+  given strRW: Spore[ReadWriter[String]] = StringRW.pack()
 
-  private[sporks] object BooleanRW extends SporkBuilder[ReadWriter[Boolean]](summon[ReadWriter[Boolean]])
-  given boolRW: Spork[ReadWriter[Boolean]] = BooleanRW.pack()
+  private[spores] object BooleanRW extends SporeBuilder[ReadWriter[Boolean]](summon[ReadWriter[Boolean]])
+  given boolRW: Spore[ReadWriter[Boolean]] = BooleanRW.pack()
 
-  private[sporks] object DoubleRW extends SporkBuilder[ReadWriter[Double]](summon[ReadWriter[Double]])
-  given doubleRW: Spork[ReadWriter[Double]] = DoubleRW.pack()
+  private[spores] object DoubleRW extends SporeBuilder[ReadWriter[Double]](summon[ReadWriter[Double]])
+  given doubleRW: Spore[ReadWriter[Double]] = DoubleRW.pack()
 
-  private[sporks] object FloatRW extends SporkBuilder[ReadWriter[Float]](summon[ReadWriter[Float]])
-  given floatRW: Spork[ReadWriter[Float]] = FloatRW.pack()
+  private[spores] object FloatRW extends SporeBuilder[ReadWriter[Float]](summon[ReadWriter[Float]])
+  given floatRW: Spore[ReadWriter[Float]] = FloatRW.pack()
 
-  private[sporks] object LongRW extends SporkBuilder[ReadWriter[Long]](summon[ReadWriter[Long]])
-  given longRW: Spork[ReadWriter[Long]] = LongRW.pack()
+  private[spores] object LongRW extends SporeBuilder[ReadWriter[Long]](summon[ReadWriter[Long]])
+  given longRW: Spore[ReadWriter[Long]] = LongRW.pack()
 
-  private[sporks] object ShortRW extends SporkBuilder[ReadWriter[Short]](summon[ReadWriter[Short]])
-  given shortRW: Spork[ReadWriter[Short]] = ShortRW.pack()
+  private[spores] object ShortRW extends SporeBuilder[ReadWriter[Short]](summon[ReadWriter[Short]])
+  given shortRW: Spore[ReadWriter[Short]] = ShortRW.pack()
 
-  private[sporks] object ByteRW extends SporkBuilder[ReadWriter[Byte]](summon[ReadWriter[Byte]])
-  given byteRW: Spork[ReadWriter[Byte]] = ByteRW.pack()
+  private[spores] object ByteRW extends SporeBuilder[ReadWriter[Byte]](summon[ReadWriter[Byte]])
+  given byteRW: Spore[ReadWriter[Byte]] = ByteRW.pack()
 
-  private[sporks] object CharRW extends SporkBuilder[ReadWriter[Char]](summon[ReadWriter[Char]])
-  given charRW: Spork[ReadWriter[Char]] = CharRW.pack()
+  private[spores] object CharRW extends SporeBuilder[ReadWriter[Char]](summon[ReadWriter[Char]])
+  given charRW: Spore[ReadWriter[Char]] = CharRW.pack()
 
-  private[sporks] object UnitRW extends SporkBuilder[ReadWriter[Unit]](summon[ReadWriter[Unit]])
-  given unitRW: Spork[ReadWriter[Unit]] = UnitRW.pack()
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Spork[ReadWriter[Spork[?]]]
-  //////////////////////////////////////////////////////////////////////////////
-
-  private[sporks] object SporkRW extends SporkBuilder[ReadWriter[Spork[?]]](macroRW)
-  given packedSporkRW[T]: Spork[ReadWriter[Spork[T]]] = SporkRW.pack().asInstanceOf[Spork[ReadWriter[Spork[T]]]]
-
-  private[sporks] object PackedObjectRW extends SporkBuilder[ReadWriter[PackedObject[?]]](macroRW)
-  given packedObjectRW[T]: Spork[ReadWriter[PackedObject[T]]] = PackedObjectRW.pack().asInstanceOf[Spork[ReadWriter[PackedObject[T]]]]
-
-  private[sporks] object PackedClassRW extends SporkBuilder[ReadWriter[PackedClass[?]]](macroRW)
-  given packedClassRW[T]: Spork[ReadWriter[PackedClass[T]]] = PackedClassRW.pack().asInstanceOf[Spork[ReadWriter[PackedClass[T]]]]
-
-  private[sporks] object PackedLambdaRW extends SporkBuilder[ReadWriter[PackedLambda[?]]](macroRW)
-  given packedLambdaRW[T]: Spork[ReadWriter[PackedLambda[T]]] = PackedLambdaRW.pack().asInstanceOf[Spork[ReadWriter[PackedLambda[T]]]]
-
-  private[sporks] object PackedEnvRW extends SporkBuilder[ReadWriter[PackedEnv[?]]](macroRW)
-  given packedEnvRW[E]: Spork[ReadWriter[PackedEnv[E]]] = PackedEnvRW.pack().asInstanceOf[Spork[ReadWriter[PackedEnv[E]]]]
-
-  private[sporks] object PackedWithEnvRW extends SporkBuilder[ReadWriter[PackedWithEnv[?, ?]]](macroRW)
-  given packedWithEnvRW[E, T]: Spork[ReadWriter[PackedWithEnv[E, T]]] = PackedWithEnvRW.pack().asInstanceOf[Spork[ReadWriter[PackedWithEnv[E, T]]]]
-
-  private[sporks] object PackedWithCtxRW extends SporkBuilder[ReadWriter[PackedWithCtx[?, ?]]](macroRW)
-  given packedWithCtxRW[E, T]: Spork[ReadWriter[PackedWithCtx[E, T]]] = PackedWithCtxRW.pack().asInstanceOf[Spork[ReadWriter[PackedWithCtx[E, T]]]]
+  private[spores] object UnitRW extends SporeBuilder[ReadWriter[Unit]](summon[ReadWriter[Unit]])
+  given unitRW: Spore[ReadWriter[Unit]] = UnitRW.pack()
 
   //////////////////////////////////////////////////////////////////////////////
-  // Spork[ReadWriter[F[T]]] for Option[T], List[T], etc.
+  // Spore[ReadWriter[Spore[?]]]
   //////////////////////////////////////////////////////////////////////////////
 
-  private[sporks] class SomeRW[T] extends SporkClassBuilder[ReadWriter[T] ?=> ReadWriter[Some[T]]]({ summon })
-  given someRW[T](using tRW: Spork[ReadWriter[T]]): Spork[ReadWriter[Some[T]]] = new SomeRW[T].pack().withCtx2(tRW)
+  private[spores] object SporeRW extends SporeBuilder[ReadWriter[Spore[?]]](macroRW)
+  given packedSporeRW[T]: Spore[ReadWriter[Spore[T]]] = SporeRW.pack().asInstanceOf[Spore[ReadWriter[Spore[T]]]]
 
-  private[sporks] object NoneRW extends SporkBuilder[ReadWriter[None.type]](summon[ReadWriter[None.type]])
-  given noneRW: Spork[ReadWriter[None.type]] = NoneRW.pack()
+  private[spores] object PackedObjectRW extends SporeBuilder[ReadWriter[PackedObject[?]]](macroRW)
+  given packedObjectRW[T]: Spore[ReadWriter[PackedObject[T]]] = PackedObjectRW.pack().asInstanceOf[Spore[ReadWriter[PackedObject[T]]]]
 
-  private[sporks] class OptionRW[T] extends SporkClassBuilder[ReadWriter[T] ?=> ReadWriter[Option[T]]]({ summon })
-  given optionRW[T](using tRW: Spork[ReadWriter[T]]): Spork[ReadWriter[Option[T]]] = new OptionRW[T].pack().withCtx2(tRW)
+  private[spores] object PackedClassRW extends SporeBuilder[ReadWriter[PackedClass[?]]](macroRW)
+  given packedClassRW[T]: Spore[ReadWriter[PackedClass[T]]] = PackedClassRW.pack().asInstanceOf[Spore[ReadWriter[PackedClass[T]]]]
 
-  private[sporks] class ListRW[T] extends SporkClassBuilder[ReadWriter[T] ?=> ReadWriter[List[T]]]({ summon })
-  given listRW[T](using tRW: Spork[ReadWriter[T]]): Spork[ReadWriter[List[T]]] = new ListRW[T].pack().withCtx2(tRW)
+  private[spores] object PackedLambdaRW extends SporeBuilder[ReadWriter[PackedLambda[?]]](macroRW)
+  given packedLambdaRW[T]: Spore[ReadWriter[PackedLambda[T]]] = PackedLambdaRW.pack().asInstanceOf[Spore[ReadWriter[PackedLambda[T]]]]
 
-  private[sporks] object Tuple0RW extends SporkBuilder[ReadWriter[EmptyTuple]](macroRW[EmptyTuple])
-  given tuple0RW: Spork[ReadWriter[EmptyTuple]] = Tuple0RW.pack()
+  private[spores] object PackedEnvRW extends SporeBuilder[ReadWriter[PackedEnv[?]]](macroRW)
+  given packedEnvRW[E]: Spore[ReadWriter[PackedEnv[E]]] = PackedEnvRW.pack().asInstanceOf[Spore[ReadWriter[PackedEnv[E]]]]
 
-  private[sporks] class Tuple1RW[T1] extends SporkClassBuilder[ReadWriter[T1] ?=> ReadWriter[Tuple1[T1]]]({ summon })
-  given tuple1RW[T1](using t1RW: Spork[ReadWriter[T1]]): Spork[ReadWriter[Tuple1[T1]]] = new Tuple1RW[T1].pack().withCtx2(t1RW)
+  private[spores] object PackedWithEnvRW extends SporeBuilder[ReadWriter[PackedWithEnv[?, ?]]](macroRW)
+  given packedWithEnvRW[E, T]: Spore[ReadWriter[PackedWithEnv[E, T]]] = PackedWithEnvRW.pack().asInstanceOf[Spore[ReadWriter[PackedWithEnv[E, T]]]]
 
-  private[sporks] class Tuple2RW[T1, T2] extends SporkClassBuilder[ReadWriter[T1] ?=> ReadWriter[T2] ?=> ReadWriter[Tuple2[T1, T2]]]({ summon })
-  given tuple2RW[T1, T2](using t1RW: Spork[ReadWriter[T1]], t2RW: Spork[ReadWriter[T2]]): Spork[ReadWriter[Tuple2[T1, T2]]] = (new Tuple2RW[T1, T2]).pack().withCtx2(t1RW).withCtx2(t2RW)
+  private[spores] object PackedWithCtxRW extends SporeBuilder[ReadWriter[PackedWithCtx[?, ?]]](macroRW)
+  given packedWithCtxRW[E, T]: Spore[ReadWriter[PackedWithCtx[E, T]]] = PackedWithCtxRW.pack().asInstanceOf[Spore[ReadWriter[PackedWithCtx[E, T]]]]
 
-  private[sporks] class Tuple3RW[T1, T2, T3] extends SporkClassBuilder[ReadWriter[T1] ?=> ReadWriter[T2] ?=> ReadWriter[T3] ?=> ReadWriter[Tuple3[T1, T2, T3]]]({ summon })
-  given tuple3RW[T1, T2, T3](using t1RW: Spork[ReadWriter[T1]], t2RW: Spork[ReadWriter[T2]], t3RW: Spork[ReadWriter[T3]]): Spork[ReadWriter[Tuple3[T1, T2, T3]]] = (new Tuple3RW[T1, T2, T3]).pack().withCtx2(t1RW).withCtx2(t2RW).withCtx2(t3RW)
+  //////////////////////////////////////////////////////////////////////////////
+  // Spore[ReadWriter[F[T]]] for Option[T], List[T], etc.
+  //////////////////////////////////////////////////////////////////////////////
+
+  private[spores] class SomeRW[T] extends SporeClassBuilder[ReadWriter[T] ?=> ReadWriter[Some[T]]]({ summon })
+  given someRW[T](using tRW: Spore[ReadWriter[T]]): Spore[ReadWriter[Some[T]]] = new SomeRW[T].pack().withCtx2(tRW)
+
+  private[spores] object NoneRW extends SporeBuilder[ReadWriter[None.type]](summon[ReadWriter[None.type]])
+  given noneRW: Spore[ReadWriter[None.type]] = NoneRW.pack()
+
+  private[spores] class OptionRW[T] extends SporeClassBuilder[ReadWriter[T] ?=> ReadWriter[Option[T]]]({ summon })
+  given optionRW[T](using tRW: Spore[ReadWriter[T]]): Spore[ReadWriter[Option[T]]] = new OptionRW[T].pack().withCtx2(tRW)
+
+  private[spores] class ListRW[T] extends SporeClassBuilder[ReadWriter[T] ?=> ReadWriter[List[T]]]({ summon })
+  given listRW[T](using tRW: Spore[ReadWriter[T]]): Spore[ReadWriter[List[T]]] = new ListRW[T].pack().withCtx2(tRW)
+
+  private[spores] object Tuple0RW extends SporeBuilder[ReadWriter[EmptyTuple]](macroRW[EmptyTuple])
+  given tuple0RW: Spore[ReadWriter[EmptyTuple]] = Tuple0RW.pack()
+
+  private[spores] class Tuple1RW[T1] extends SporeClassBuilder[ReadWriter[T1] ?=> ReadWriter[Tuple1[T1]]]({ summon })
+  given tuple1RW[T1](using t1RW: Spore[ReadWriter[T1]]): Spore[ReadWriter[Tuple1[T1]]] = new Tuple1RW[T1].pack().withCtx2(t1RW)
+
+  private[spores] class Tuple2RW[T1, T2] extends SporeClassBuilder[ReadWriter[T1] ?=> ReadWriter[T2] ?=> ReadWriter[Tuple2[T1, T2]]]({ summon })
+  given tuple2RW[T1, T2](using t1RW: Spore[ReadWriter[T1]], t2RW: Spore[ReadWriter[T2]]): Spore[ReadWriter[Tuple2[T1, T2]]] = (new Tuple2RW[T1, T2]).pack().withCtx2(t1RW).withCtx2(t2RW)
+
+  private[spores] class Tuple3RW[T1, T2, T3] extends SporeClassBuilder[ReadWriter[T1] ?=> ReadWriter[T2] ?=> ReadWriter[T3] ?=> ReadWriter[Tuple3[T1, T2, T3]]]({ summon })
+  given tuple3RW[T1, T2, T3](using t1RW: Spore[ReadWriter[T1]], t2RW: Spore[ReadWriter[T2]], t3RW: Spore[ReadWriter[T3]]): Spore[ReadWriter[Tuple3[T1, T2, T3]]] = (new Tuple3RW[T1, T2, T3]).pack().withCtx2(t1RW).withCtx2(t2RW).withCtx2(t3RW)
 
 }

@@ -1,4 +1,4 @@
-package sporks
+package spores
 
 import scala.annotation.implicitNotFound
 import upickle.default.*
@@ -10,37 +10,37 @@ import upickle.default.*
   * Use [[unwrap]] to extract the packed closure.
   *
   * Use [[withEnv]] to partially apply the closure of type `T1 => R` to a value
-  * of type `T1`. Use [[withEnv2]] to apply it to a value of type `Spork[T1]`.
+  * of type `T1`. Use [[withEnv2]] to apply it to a value of type `Spore[T1]`.
   *
   * Use [[withCtx]] to partially apply the closure of type `T1 ?=> R` to a value
-  * of type `T1`. Use [[withCtx2]] to apply it to a value of type `Spork[T1]`.
+  * of type `T1`. Use [[withCtx2]] to apply it to a value of type `Spore[T1]`.
   *
-  * Sporks are created by:
-  *   - (JVM) The sporks.jvm.Spork lambda factories: `sp`, `spe`, `spc`.
+  * Spores are created by:
+  *   - (JVM) The spores.jvm.Spore lambda factories: `sp`, `spe`, `spc`.
   *     Requires explicit capture of environment variables.
-  *   - (JVM) The sporks.jvm.AutoCapture lambda factory: `spauto`. Implicitly
+  *   - (JVM) The spores.jvm.AutoCapture lambda factory: `spauto`. Implicitly
   *     captures environment variables.
   *   - (JVM, Native, ScalaJS) Packing a top-level object which extends the
-  *     [[SporkBuilder]] trait.
+  *     [[SporeBuilder]] trait.
   *   - (JVM, Native, ScalaJS) Packing a top-level class which extends the
-  *     [[SporkClassBuilder]] trait.
+  *     [[SporeClassBuilder]] trait.
   *   - (JVM, Native, ScalaJS) The [[Env]] factory for packing a value of type
-  *     `T` for which there is a Spork[ReadWriter[T]].
+  *     `T` for which there is a Spore[ReadWriter[T]].
   *
-  * Serializing and deserializing a Spork is easiest done by using the `upickle`
+  * Serializing and deserializing a Spore is easiest done by using the `upickle`
   * library.
   *
   * Compile-time macros guarantee that it is safe to create, serialize,
-  * deserialize, and unwrap the packed closure. Creating a Spork is gauranteed
+  * deserialize, and unwrap the packed closure. Creating a Spore is gauranteed
   * to not cause runtime errors. Serializing, deserializing, and unwrapping a
-  * Spork is guaranteed to not cause runtime errors.
+  * Spore is guaranteed to not cause runtime errors.
   *
   * @example
   *   {{{
-  * val mySpork: Spork[Int => String] = sp { x => x.toString.reverse }
-  * val myAppliedSpork: Spork[String] = mySpork.withEnv(10)
-  * val serialized = upickle.default.write(myAppliedSpork)
-  * val deserialized = upickle.default.read[Spork[String]](serialized)
+  * val mySpore: Spore[Int => String] = sp { x => x.toString.reverse }
+  * val myAppliedSpore: Spore[String] = mySpore.withEnv(10)
+  * val serialized = upickle.default.write(myAppliedSpore)
+  * val deserialized = upickle.default.read[Spore[String]](serialized)
   * val unwrapped = deserialized.unwrap()
   * unwrapped // "01"
   *   }}}
@@ -48,8 +48,8 @@ import upickle.default.*
   * @tparam T
   *   The type of the packed closure.
   */
-sealed trait Spork[+T] {
-  import sporks.Packed.*
+sealed trait Spore[+T] {
+  import spores.Packed.*
 
   /** Applies the packed closure to a value of type `T1`. Only available if the
     * wrapped closure of type `T` is a subtype of `T1 => R`.
@@ -60,26 +60,26 @@ sealed trait Spork[+T] {
     * @param env
     *   The value applied to the packed closure.
     * @param prw
-    *   The implicit `Spork[ReadWriter[T1]]` used for packing the `env`.
+    *   The implicit `Spore[ReadWriter[T1]]` used for packing the `env`.
     * @tparam T1
     *   The type of the value applied to the packed closure.
     * @tparam R
     *   The return type of the packed closure.
     * @return
-    *   A new `Spork[R]` with the result of the application.
+    *   A new `Spore[R]` with the result of the application.
     */
-  def withEnv[T1, R](env: T1)(using prw: Spork[ReadWriter[T1]])(using @implicitNotFound(CanWithEnv.MSG) ev: CanWithEnv[T, T1, R]): Spork[R] = {
+  def withEnv[T1, R](env: T1)(using prw: Spore[ReadWriter[T1]])(using @implicitNotFound(CanWithEnv.MSG) ev: CanWithEnv[T, T1, R]): Spore[R] = {
     PackedWithEnv(this, PackedEnv(write(env)(using prw.unwrap()), prw))
   }
 
-  /** Optimization for applying this `Spork[T1 => R]` directly to a `Spork[T1]`.
+  /** Optimization for applying this `Spore[T1 => R]` directly to a `Spore[T1]`.
     *
-    * This avoids the need to pack the `env` as it already is a Spork.
+    * This avoids the need to pack the `env` as it already is a Spore.
     *
     * Only available if the wrapped closure of type `T` is a subtype of `T1 =>
     * R`.
     */
-  def withEnv2[T1, R](env: Spork[T1])(using @implicitNotFound(CanWithEnv.MSG) ev: CanWithEnv[T, T1, R]): Spork[R] = {
+  def withEnv2[T1, R](env: Spore[T1])(using @implicitNotFound(CanWithEnv.MSG) ev: CanWithEnv[T, T1, R]): Spore[R] = {
     PackedWithEnv(this, env)
   }
 
@@ -92,35 +92,35 @@ sealed trait Spork[+T] {
     * @param env
     *   The context value applied to the packed closure.
     * @param prw
-    *   The implicit `Spork[ReadWriter[T1]]` used for packing the `env`.
+    *   The implicit `Spore[ReadWriter[T1]]` used for packing the `env`.
     * @tparam T1
     *   The type of the context value applied to the packed closure.
     * @tparam R
     *   The return type of the packed closure.
     * @return
-    *   A new `Spork[R]` with the result of the application.
+    *   A new `Spore[R]` with the result of the application.
     */
-  def withCtx[T1, R](env: T1)(using prw: Spork[ReadWriter[T1]])(using @implicitNotFound(CanWithCtx.MSG) ev: CanWithCtx[T, T1, R]): Spork[R] = {
+  def withCtx[T1, R](env: T1)(using prw: Spore[ReadWriter[T1]])(using @implicitNotFound(CanWithCtx.MSG) ev: CanWithCtx[T, T1, R]): Spore[R] = {
     PackedWithCtx(this, PackedEnv(write(env)(using prw.unwrap()), prw))
   }
 
-  /** Optimization for applying this `Spork[T1 ?=> R]` directly to a
-    * `Spork[T1]`.
+  /** Optimization for applying this `Spore[T1 ?=> R]` directly to a
+    * `Spore[T1]`.
     *
-    * This avoids the need to pack the `env` as it already is a Spork.
+    * This avoids the need to pack the `env` as it already is a Spore.
     *
     * Only available if the wrapped closure of type `T` is a subtype of `T1 ?=>
     * R`.
     */
-  def withCtx2[T1, R](env: Spork[T1])(using @implicitNotFound(CanWithCtx.MSG) ev: CanWithCtx[T, T1, R]): Spork[R] = {
+  def withCtx2[T1, R](env: Spore[T1])(using @implicitNotFound(CanWithCtx.MSG) ev: CanWithCtx[T, T1, R]): Spore[R] = {
     PackedWithCtx(this, env)
   }
 
-  def map[U](fun: Spork[T => U]): Spork[U] = {
+  def map[U](fun: Spore[T => U]): Spore[U] = {
     fun.withEnv2(this)
   }
 
-  def flatMap[U](fun: Spork[T => Spork[U]]): Spork[U] = {
+  def flatMap[U](fun: Spore[T => Spore[U]]): Spore[U] = {
     fun.withEnv2(this).unwrap()
   }
 
@@ -131,9 +131,9 @@ sealed trait Spork[+T] {
     */
   def unwrap(): T = {
     this match
-      case PackedObject(fun) => Reflection.getModuleFieldValue[SporkBuilder[T]](fun).fun
-      case PackedClass(fun)  => Reflection.getClassInstance[SporkClassBuilder[T]](fun).fun
-      case PackedLambda(fun) => Reflection.getClassInstance[SporkLambdaBuilder[T]](fun).fun
+      case PackedObject(fun) => Reflection.getModuleFieldValue[SporeBuilder[T]](fun).fun
+      case PackedClass(fun)  => Reflection.getClassInstance[SporeClassBuilder[T]](fun).fun
+      case PackedLambda(fun) => Reflection.getClassInstance[SporeLambdaBuilder[T]](fun).fun
       case PackedEnv(env, rw) => read(env)(using rw.unwrap())
       case PackedWithEnv(packed, packedEnv) => packed.unwrap()(packedEnv.unwrap())
       case PackedWithCtx(packed, packedEnv) => packed.unwrap()(using packedEnv.unwrap())
@@ -144,19 +144,19 @@ sealed trait Spork[+T] {
 private object Packed {
 
   // Static:
-  final case class PackedObject[+T](fun: String) extends Spork[T]
-  final case class PackedClass[+T] (fun: String) extends Spork[T]
-  final case class PackedLambda[+T](fun: String) extends Spork[T]
+  final case class PackedObject[+T](fun: String) extends Spore[T]
+  final case class PackedClass[+T] (fun: String) extends Spore[T]
+  final case class PackedLambda[+T](fun: String) extends Spore[T]
   // Dynamic:
-  final case class PackedEnv[E]        (env: String, rw: Spork[ReadWriter[E]])       extends Spork[E]
-  final case class PackedWithEnv[E, +T](packed: Spork[E => T],  packedEnv: Spork[E]) extends Spork[T]
-  final case class PackedWithCtx[E, +T](packed: Spork[E ?=> T], packedEnv: Spork[E]) extends Spork[T]
+  final case class PackedEnv[E]        (env: String, rw: Spore[ReadWriter[E]])       extends Spore[E]
+  final case class PackedWithEnv[E, +T](packed: Spore[E => T],  packedEnv: Spore[E]) extends Spore[T]
+  final case class PackedWithCtx[E, +T](packed: Spore[E ?=> T], packedEnv: Spore[E]) extends Spore[T]
 
 }
 
 
-private type CanWithEnv[T, T1, R] = Spork[T] <:< Spork[T1 => R]
+private type CanWithEnv[T, T1, R] = Spore[T] <:< Spore[T1 => R]
 private object CanWithEnv { inline val MSG = "Cannot pack contained type ${T} with environment type ${T1}. It is not a function type of ${T1} => ${R}." }
 
-private type CanWithCtx[T, T1, R] = Spork[T] <:< Spork[T1 ?=> R]
+private type CanWithCtx[T, T1, R] = Spore[T] <:< Spore[T1 ?=> R]
 private object CanWithCtx { inline val MSG = "Cannot pack contained type ${T} with context type ${T1}. It is not a function type of ${T1} ?=> ${R}." }

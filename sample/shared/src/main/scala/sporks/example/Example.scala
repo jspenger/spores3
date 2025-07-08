@@ -1,45 +1,45 @@
-package sporks.example
+package spores.example
 
-import sporks.*
-import sporks.given
-import sporks.example.platform.*
+import spores.*
+import spores.given
+import spores.example.platform.*
 
 
 object Example {
 
-  object Spork1 extends SporkBuilder[Int => String](x => x.toString.reverse)
+  object Spore1 extends SporeBuilder[Int => String](x => x.toString.reverse)
 
-  object Spork2 extends SporkBuilder[Int => Int => String](env => x => (env + x).toString.reverse)
+  object Spore2 extends SporeBuilder[Int => Int => String](env => x => (env + x).toString.reverse)
 
-  object Predicate extends SporkBuilder[Int => Boolean](x => x > 10)
+  object Predicate extends SporeBuilder[Int => Boolean](x => x > 10)
 
-  object HigherLevelFilter extends SporkBuilder[Spork[Int => Boolean] => Int => Boolean](env => x => env.unwrap().apply(x))
+  object HigherLevelFilter extends SporeBuilder[Spore[Int => Boolean] => Int => Boolean](env => x => env.unwrap().apply(x))
 
-  object SporkOption extends SporkBuilder[Option[Int] => Int => String](env => x => env.map(_ + x).map(_.toString.reverse).getOrElse(""))
+  object SporeOption extends SporeBuilder[Option[Int] => Int => String](env => x => env.map(_ + x).map(_.toString.reverse).getOrElse(""))
 
-  object SporkWithCtx extends SporkBuilder[Int ?=> String](summon[Int].toString().reverse)
+  object SporeWithCtx extends SporeBuilder[Int ?=> String](summon[Int].toString().reverse)
 
-  class Constant[T] extends SporkClassBuilder[T => T](x => x)
+  class Constant[T] extends SporeClassBuilder[T => T](x => x)
 
 
   def main(args: Array[String]): Unit = {
-    // `pack` the `SporkBuilder` to get a `Spork` and `unwrap` it to
+    // `pack` the `SporeBuilder` to get a `Spore` and `unwrap` it to
     // reveal the packed function.
     println(
-      Spork1.pack().unwrap()(10)
+      Spore1.pack().unwrap()(10)
     )
 
-    // `withEnv` to pack an environment into the `Spork`.
+    // `withEnv` to pack an environment into the `Spore`.
     println(
-      Spork2.pack().withEnv(11).unwrap()(10)
+      Spore2.pack().withEnv(11).unwrap()(10)
     )
 
-    // The resulting `Spork` is a simple data structure.
+    // The resulting `Spore` is a simple data structure.
     println(
-      Spork2.pack().withEnv(11)
+      Spore2.pack().withEnv(11)
     )
 
-    // Higher order sporks can pack other sporks in their environment.
+    // Higher order spores can pack other spores in their environment.
     println(
       HigherLevelFilter.pack().withEnv(Predicate.pack()).unwrap()(11)
     )
@@ -47,49 +47,49 @@ object Example {
     // Besides primitive types, standard library types like `Option` can also be
     // packed in the environment.
     println(
-      SporkOption.pack().withEnv(Some(10)).unwrap()(13)
+      SporeOption.pack().withEnv(Some(10)).unwrap()(13)
     )
 
     // The environment paramter can also be a context parameter. A context
     // parameter can be packed using the `withCtx` method.
     println(
-      SporkWithCtx.pack().withCtx(99).unwrap()
+      SporeWithCtx.pack().withCtx(99).unwrap()
     )
 
-    // The `SporkClassBuilder` can be used to create sporks with type
+    // The `SporeClassBuilder` can be used to create spores with type
     // parameters.
     println({
       val constant10 = new Constant[Int]().pack().withEnv(10)
       constant10.unwrap()
     })
 
-    // ... Although, try to stick to the `SporkBuilder` for performance
+    // ... Although, try to stick to the `SporeBuilder` for performance
     // reasons. Their main use case can be found in package.scala.
 
-    // Another method for creating sporks is by using the `Spork.apply`
-    // method. This can be imported from the `sporks.jvm` package, as it is
+    // Another method for creating spores is by using the `Spore.apply`
+    // method. This can be imported from the `spores.jvm` package, as it is
     // only available on the JVM. It is a convenient method for creating
-    // spork lambdas. See the example in LambdaExample.scala.
+    // spore lambdas. See the example in LambdaExample.scala.
     //
-    // val lambda = Spork.apply[Int => String] { x => x.toString.reverse }
+    // val lambda = Spore.apply[Int => String] { x => x.toString.reverse }
 
-    // A `Spork` can be serialized/pickled to JSON by using `upickle`.
-    writeToFile(Spork1.pack(), "Spork1.json")
+    // A `Spore` can be serialized/pickled to JSON by using `upickle`.
+    writeToFile(Spore1.pack(), "Spore1.json")
     println(
-      readFromFile[Spork[Int => String]]("Spork1.json")
+      readFromFile[Spore[Int => String]]("Spore1.json")
     )
 
-    writeToFile(Spork2.pack().withEnv(10), "Spork2.json")
+    writeToFile(Spore2.pack().withEnv(10), "Spore2.json")
     println(
-      readFromFile[Spork[Int => String]]("Spork2.json")
+      readFromFile[Spore[Int => String]]("Spore2.json")
     )
 
     writeToFile(HigherLevelFilter.pack().withEnv(Predicate.pack()), "Filter.json")
     println(
-      readFromFile[Spork[Int => Boolean]]("Filter.json")
+      readFromFile[Spore[Int => Boolean]]("Filter.json")
     )
     println(
-      readFromFile[Spork[Int => Boolean]]("Filter.json").unwrap().apply(12)
+      readFromFile[Spore[Int => Boolean]]("Filter.json").unwrap().apply(12)
     )
   }
 }

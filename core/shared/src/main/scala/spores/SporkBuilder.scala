@@ -1,16 +1,16 @@
-package sporks
+package spores
 
 import upickle.default.*
 
-import sporks.Reflect
-import sporks.Packed.*
+import spores.Reflect
+import spores.Packed.*
 
 
-/** A builder trait that packs a [[Spork]] with a closure of type `T`. Extend
+/** A builder trait that packs a [[Spore]] with a closure of type `T`. Extend
   * this trait from a **top-level object** and provide the closure as a trait
   * parameter.
   *
-  * Note: Use [[SporkClassBuilder]] if type parameters are needed.
+  * Note: Use [[SporeClassBuilder]] if type parameters are needed.
   *
   * Note: Must be extended from a top-level object. An object is considered
   * top-level if it is nested directly inside a package, or nested inside
@@ -19,8 +19,8 @@ import sporks.Packed.*
   *
   * @example
   *   {{{
-  * object MyBuilder extends SporkBuilder[Int => String](x => x.toString().reverse)
-  * val mySpork: Spork[Int => String] = MyBuilder.pack()
+  * object MyBuilder extends SporeBuilder[Int => String](x => x.toString().reverse)
+  * val mySpore: Spore[Int => String] = MyBuilder.pack()
   *   }}}
   *
   * @tparam T
@@ -29,23 +29,23 @@ import sporks.Packed.*
   *   The wrapped closure.
   */
 @Reflection.EnableReflectiveInstantiation
-trait SporkBuilder[+T](private[sporks] val fun: T) {
+trait SporeBuilder[+T](private[spores] val fun: T) {
 
-  /** Packs the wrapped closure into a [[Spork]] of type `T`.
+  /** Packs the wrapped closure into a [[Spore]] of type `T`.
     *
     * @return
-    *   A new Spork with the wrapped closure.
+    *   A new Spore with the wrapped closure.
     */
-  final inline def pack(): Spork[T] = {
-    ${ SporkBuilder.packMacro('this) }
+  final inline def pack(): Spore[T] = {
+    ${ SporeBuilder.packMacro('this) }
   }
 }
 
 
-private object SporkBuilder {
+private object SporeBuilder {
   import scala.quoted.*
 
-  def packMacro[T](expr: Expr[SporkBuilder[T]])(using Type[T], Quotes): Expr[Spork[T]] = {
+  def packMacro[T](expr: Expr[SporeBuilder[T]])(using Type[T], Quotes): Expr[Spore[T]] = {
     Macros.isTopLevelObject(expr)
     '{ PackedObject($expr.getClass().getName()) }
   }

@@ -1,13 +1,13 @@
 /** Simple and safe serialization/pickling library for closures/functions in
   * Scala 3.
   *
-  * A [[Spork]] wraps a closures which is safe to serialize and deserialize.
-  * Create a Spork using the factories in sporks.jvm.Spork or
-  * sporks.jvm.AutoCapture, or by using the [[sporks.SporkBuilder]] or
-  * [[sporks.SporkClassBuilder]].
+  * A [[Spore]] wraps a closures which is safe to serialize and deserialize.
+  * Create a Spore using the factories in spores.jvm.Spore or
+  * spores.jvm.AutoCapture, or by using the [[spores.SporeBuilder]] or
+  * [[spores.SporeClassBuilder]].
   */
-package object sporks {
+package object spores {
 
-  export sporks.ReadWriters.given
+  export spores.ReadWriters.given
 
 }

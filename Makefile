@@ -26,8 +26,8 @@ test:
 .PHONY: test-example
 
 test-example:
-	sbt -Dsbt.server=false -v "exampleJVM / runMain sporks.example.Example"
-	sbt -Dsbt.server=false -v "exampleJVM / runMain sporks.example.LambdaExample"
+	sbt -Dsbt.server=false -v "exampleJVM / runMain spores.example.Example"
+	sbt -Dsbt.server=false -v "exampleJVM / runMain spores.example.LambdaExample"
 	sbt -Dsbt.server=false -v "exampleJS / run"
 	sbt -Dsbt.server=false -v "exampleNative / run"
 
@@ -66,8 +66,8 @@ cross-test:
 cross-test-example:
 	/usr/bin/env bash -e -x -o pipefail -c; \
 	for version in $(VERSIONS); do \
-		sbt -Dsbt.server=false ++$${version}! -v "exampleJVM / runMain sporks.example.Example"; \
-		sbt -Dsbt.server=false ++$${version}! -v "exampleJVM / runMain sporks.example.LambdaExample"; \
+		sbt -Dsbt.server=false ++$${version}! -v "exampleJVM / runMain spores.example.Example"; \
+		sbt -Dsbt.server=false ++$${version}! -v "exampleJVM / runMain spores.example.LambdaExample"; \
 		sbt -Dsbt.server=false ++$${version}! -v "exampleJS / run"; \
 		sbt -Dsbt.server=false ++$${version}! -v "exampleNative / run"; \
 	done

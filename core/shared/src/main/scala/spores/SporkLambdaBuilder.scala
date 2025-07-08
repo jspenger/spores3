@@ -1,26 +1,26 @@
-package sporks
+package spores
 
 import upickle.default.*
 
-import sporks.Reflect
-import sporks.Packed.*
+import spores.Reflect
+import spores.Packed.*
 
 
-/** Internal API. Used by the sporks.jvm.Spork lambda factories. */
+/** Internal API. Used by the spores.jvm.Spore lambda factories. */
 @Reflection.EnableReflectiveInstantiation
-private[sporks] trait SporkLambdaBuilder[+T](val fun: T) {
+private[spores] trait SporeLambdaBuilder[+T](val fun: T) {
 
-  final inline def pack(): Spork[T] = {
-    ${ SporkLambdaBuilder.packMacro('this) }
+  final inline def pack(): Spore[T] = {
+    ${ SporeLambdaBuilder.packMacro('this) }
   }
 }
 
 
-private object SporkLambdaBuilder {
+private object SporeLambdaBuilder {
   import scala.quoted.*
 
-  def packMacro[T](expr: Expr[SporkLambdaBuilder[T]])(using Type[T], Quotes): Expr[Spork[T]] = {
-    // No checks needed, all relevant checks are done in the sporks.jvm.Spork lambda factories.
+  def packMacro[T](expr: Expr[SporeLambdaBuilder[T]])(using Type[T], Quotes): Expr[Spore[T]] = {
+    // No checks needed, all relevant checks are done in the spores.jvm.Spore lambda factories.
     '{ PackedLambda($expr.getClass().getName()) }
   }
 }

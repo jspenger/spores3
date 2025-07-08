@@ -1,42 +1,42 @@
-package sporks
+package spores
 
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.junit.Test
 import org.junit.Assert.*
 
-import sporks.given
-import sporks.*
-import sporks.TestUtils.*
+import spores.given
+import spores.*
+import spores.TestUtils.*
 
-object SporkClassBuilderErrorTests:
-  object NotClzClz extends SporkClassBuilder[Int => Int](x => x)
+object SporeClassBuilderErrorTests:
+  object NotClzClz extends SporeClassBuilder[Int => Int](x => x)
 
-  def someMethod: SporkClassBuilder[Int => Int] = {
-    class Local extends SporkClassBuilder[Int => Int](x => x)
+  def someMethod: SporeClassBuilder[Int => Int] = {
+    class Local extends SporeClassBuilder[Int => Int](x => x)
     new Local()
   }
 
   class NestedBuilderInClass:
-    class Inner extends SporkClassBuilder[Int](10)
+    class Inner extends SporeClassBuilder[Int](10)
 
-  class ClassWithoutPublicConstructor private () extends SporkClassBuilder[Int => Int](x => x)
+  class ClassWithoutPublicConstructor private () extends SporeClassBuilder[Int => Int](x => x)
   object ClassWithoutPublicConstructor:
     def apply(): ClassWithoutPublicConstructor = new ClassWithoutPublicConstructor()
 
-  class ClassWithParameters(i: Int) extends SporkClassBuilder[() => Int](() => i)
+  class ClassWithParameters(i: Int) extends SporeClassBuilder[() => Int](() => i)
 
   class F[T]
-  class ClassWithContext1[T: F] extends SporkClassBuilder[F[T]](summon)
-  class ClassWithContext2[T](using F[T]) extends SporkClassBuilder[F[T]](summon)
-  class ClassWithContext3[T](implicit f: F[T]) extends SporkClassBuilder[F[T]](summon)
+  class ClassWithContext1[T: F] extends SporeClassBuilder[F[T]](summon)
+  class ClassWithContext2[T](using F[T]) extends SporeClassBuilder[F[T]](summon)
+  class ClassWithContext3[T](implicit f: F[T]) extends SporeClassBuilder[F[T]](summon)
 
 @RunWith(classOf[JUnit4])
-class SporkClassBuilderErrorTests:
-  import SporkClassBuilderErrorTests.*
+class SporeClassBuilderErrorTests:
+  import SporeClassBuilderErrorTests.*
 
   @Test
-  def testObjectSporkClassBuilderError(): Unit =
+  def testObjectSporeClassBuilderError(): Unit =
     assertTrue:
       typeCheckErrors:
         """
@@ -44,7 +44,7 @@ class SporkClassBuilderErrorTests:
         """
       .contains:
         """
-        The provided SporkClassBuilder `sporks.SporkClassBuilderErrorTests$.NotClzClz$` is not a class.
+        The provided SporeClassBuilder `spores.SporeClassBuilderErrorTests$.NotClzClz$` is not a class.
         """.trim()
 
     assertTrue:
@@ -55,11 +55,11 @@ class SporkClassBuilderErrorTests:
         """
       .contains:
         """
-        The provided SporkClassBuilder `sporks.SporkClassBuilderErrorTests$.NotClzClz$` is not a class.
+        The provided SporeClassBuilder `spores.SporeClassBuilderErrorTests$.NotClzClz$` is not a class.
         """.trim()
 
   @Test
-  def testSporkClassBuilderNestedInClassError(): Unit =
+  def testSporeClassBuilderNestedInClassError(): Unit =
     assertTrue:
       typeCheckErrors:
         """
@@ -69,11 +69,11 @@ class SporkClassBuilderErrorTests:
         """
       .contains:
         """
-        The provided SporkClassBuilder `sporks.SporkClassBuilderErrorTests$.NestedBuilderInClass.Inner` is nested in a class.
+        The provided SporeClassBuilder `spores.SporeClassBuilderErrorTests$.NestedBuilderInClass.Inner` is nested in a class.
         """.trim()
 
   @Test
-  def testSporkClassBuilderNestedInMethodError(): Unit =
+  def testSporeClassBuilderNestedInMethodError(): Unit =
     assertTrue:
       typeCheckErrors:
         """
@@ -81,11 +81,11 @@ class SporkClassBuilderErrorTests:
         """
       .contains:
         """
-        The provided SporkClassBuilder `sporks.SporkClassBuilder` is not a concrete class.
+        The provided SporeClassBuilder `spores.SporeClassBuilder` is not a concrete class.
         """.trim()
 
   @Test
-  def testSporkClassBuilderWithPrivateConstructorError(): Unit =
+  def testSporeClassBuilderWithPrivateConstructorError(): Unit =
     assertTrue:
       typeCheckErrors:
         """
@@ -93,11 +93,11 @@ class SporkClassBuilderErrorTests:
         """
       .contains:
         """
-        The provided SporkClassBuilder `sporks.SporkClassBuilderErrorTests$.ClassWithoutPublicConstructor` `<init>` does not have a public constructor.
+        The provided SporeClassBuilder `spores.SporeClassBuilderErrorTests$.ClassWithoutPublicConstructor` `<init>` does not have a public constructor.
         """.trim()
 
   @Test
-  def testSporkClassBuilderWithParameterError(): Unit =
+  def testSporeClassBuilderWithParameterError(): Unit =
     assertTrue:
       typeCheckErrors:
         """
@@ -105,20 +105,20 @@ class SporkClassBuilderErrorTests:
         """
       .contains:
         """
-        The constructor of the provided SporkClassBuilder `sporks.SporkClassBuilderErrorTests$.ClassWithParameters` `<init>` does not have an empty parameter list.
+        The constructor of the provided SporeClassBuilder `spores.SporeClassBuilderErrorTests$.ClassWithParameters` `<init>` does not have an empty parameter list.
         """.trim()
 
   @Test
-  def testSporkClassBuilderWithContextParameterError(): Unit =
+  def testSporeClassBuilderWithContextParameterError(): Unit =
     // Catches a common mistake in which implicit parameters are used in the
     // constructor. For example, this would seem like a reasonable thing to do,
     // but will not work:
     //
-    // class PackedRW[T: ReadWriter] extends SporkClassBuilder[ReadWriter[T]](summon[ReadWriter[T]])
-    // given Spork[ReadWriter[T]] = PackedRW[T].pack()
+    // class PackedRW[T: ReadWriter] extends SporeClassBuilder[ReadWriter[T]](summon[ReadWriter[T]])
+    // given Spore[ReadWriter[T]] = PackedRW[T].pack()
     //
     // // This will crash at runtime, as the init method is assumed to not have any params.
-    // summon[Spork[ReadWriter[Int]]].unwrap()
+    // summon[Spore[ReadWriter[Int]]].unwrap()
 
     assertTrue:
       typeCheckErrors:
@@ -128,7 +128,7 @@ class SporkClassBuilderErrorTests:
         """
       .contains:
         """
-        The constructor of the provided SporkClassBuilder `sporks.SporkClassBuilderErrorTests$.ClassWithContext1` `<init>` contains a context parameter list.
+        The constructor of the provided SporeClassBuilder `spores.SporeClassBuilderErrorTests$.ClassWithContext1` `<init>` contains a context parameter list.
         """.trim()
 
     assertTrue:
@@ -139,7 +139,7 @@ class SporkClassBuilderErrorTests:
         """
       .contains:
         """
-        The constructor of the provided SporkClassBuilder `sporks.SporkClassBuilderErrorTests$.ClassWithContext2` `<init>` contains a context parameter list.
+        The constructor of the provided SporeClassBuilder `spores.SporeClassBuilderErrorTests$.ClassWithContext2` `<init>` contains a context parameter list.
         """.trim()
 
     assertTrue:
@@ -150,5 +150,5 @@ class SporkClassBuilderErrorTests:
         """
       .contains:
         """
-        The constructor of the provided SporkClassBuilder `sporks.SporkClassBuilderErrorTests$.ClassWithContext3` `<init>` contains a context parameter list.
+        The constructor of the provided SporeClassBuilder `spores.SporeClassBuilderErrorTests$.ClassWithContext3` `<init>` contains a context parameter list.
         """.trim()

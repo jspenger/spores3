@@ -1,38 +1,38 @@
-package sporks.jvm
+package spores.jvm
 
 import scala.quoted.*
 import upickle.default.ReadWriter
 
-import sporks.*
-import sporks.given
+import spores.*
+import spores.given
 
 
-/** A factory for creating Sporks that are safe to serialize and deserialize.
+/** A factory for creating Spores that are safe to serialize and deserialize.
   * Automatically captures variables and checks captured variables.
   *
   * Automatically capturing a variable requires an implicit
-  * `Spork[ReadWriter[T]]` in scope, where `T` is the type of the captured
+  * `Spore[ReadWriter[T]]` in scope, where `T` is the type of the captured
   * variable.
   *
-  * Note: This Spork factory only works on the JVM. Use the
-  * [[sporks.SporkBuilder]] or [[sporks.SporkClassBuilder]] if ScalaJS or
+  * Note: This Spore factory only works on the JVM. Use the
+  * [[spores.SporeBuilder]] or [[spores.SporeClassBuilder]] if ScalaJS or
   * ScalaNative support is needed.
   */
 object AutoCapture {
 
-  /** Create a Spork from `f`. Captured variables in `f` must have an implicit
-    * `Spork[ReadWriter[T]]` in scope, where `T` is the type of the captured
+  /** Create a Spore from `f`. Captured variables in `f` must have an implicit
+    * `Spore[ReadWriter[T]]` in scope, where `T` is the type of the captured
     * variable.
     *
-    * The created Spork is safe to serialize and deserialize. If a captured
-    * variable does not have an implicit `Spork[ReadWriter[T]]` in scope then it
+    * The created Spore is safe to serialize and deserialize. If a captured
+    * variable does not have an implicit `Spore[ReadWriter[T]]` in scope then it
     * will cause a compiler error.
     *
     * @example
     *   {{{
-    * def isBetween(x: Int , y: Int): Spork[Int => Boolean] = {
+    * def isBetween(x: Int , y: Int): Spore[Int => Boolean] = {
     *   // `x` and `y` are captured variables of type `Int`, so we need to
-    *   // provide an implicit `Spork[ReadWriter[Int]]` in scope.
+    *   // provide an implicit `Spore[ReadWriter[Int]]` in scope.
     *   AutoCapture.apply { (i: Int) => x <= i && i < y }
     * }
     *   }}}
@@ -42,13 +42,13 @@ object AutoCapture {
     * @tparam F
     *   The type of the closure.
     * @return
-    *   A new `Spork[F]` with the packed closure `f`.
+    *   A new `Spore[F]` with the packed closure `f`.
     */
-  inline def apply[F](inline f: F): Spork[F] = {
+  inline def apply[F](inline f: F): Spore[F] = {
     ${ liftImpl[F]('f) }
   }
 
-  private def liftImpl[F: Type](fExpr: Expr[F])(using Quotes): Expr[Spork[F]] = {
+  private def liftImpl[F: Type](fExpr: Expr[F])(using Quotes): Expr[Spore[F]] = {
     import quotes.reflect.*
 
     // 1. Get all captured symbols
@@ -65,7 +65,7 @@ object AutoCapture {
       // ((alternative: )) val capTpe = cap.map(_.symbol.termRef.widen).reduceLeft(AndType(_, _))
       // `cap.head` is safe as `cap` groups are nonempty by construction
       val capTpe = cap.head.symbol.termRef.widen
-      val rwTpe = TypeRepr.of[[T] =>> Spork[ReadWriter[T]]].appliedTo(capTpe)
+      val rwTpe = TypeRepr.of[[T] =>> Spore[ReadWriter[T]]].appliedTo(capTpe)
       val result = Implicits.search(rwTpe)
       result match {
         case succ: ImplicitSearchSuccess =>
@@ -115,9 +115,9 @@ object AutoCapture {
     val lifted = liftAllSymbolGroups(Symbol.spliceOwner, captures.reverse, fExpr.asTerm)
 
     // 4. Pack the new lifted function...
-    val packed: Expr[Spork[Any]] = '{
+    val packed: Expr[Spore[Any]] = '{
       val lambda = {
-        class Lambda extends SporkLambdaBuilder(${lifted.asExpr})
+        class Lambda extends SporeLambdaBuilder(${lifted.asExpr})
         (new Lambda())
       }
       lambda.pack()
@@ -129,13 +129,13 @@ object AutoCapture {
       val env: Expr[Any] = Ref(cap.head.symbol).asExpr
       tmp = '{
         $tmp
-          .asInstanceOf[Spork[Any => Any]]
+          .asInstanceOf[Spore[Any => Any]]
           .withEnv($env)(using $rw.asInstanceOf)
       }
     }
 
     '{
-      $tmp.asInstanceOf[Spork[F]]
+      $tmp.asInstanceOf[Spore[F]]
     }
   }
 

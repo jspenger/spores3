@@ -1,22 +1,22 @@
-package sporks.jvm
+package spores.jvm
 
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.junit.Test
 import org.junit.Assert.*
 
-import sporks.given
-import sporks.*
-import sporks.TestUtils.*
+import spores.given
+import spores.*
+import spores.TestUtils.*
 
 // // The following code should produce a compile error:
-// // Invalid capture of variable `x`. Use the first parameter of a spork's body to refer to the spork's environment.bloop
+// // Invalid capture of variable `x`. Use the first parameter of a spore's body to refer to the spore's environment.bloop
 // // ... but reproducing it with the typeCheckErrors macro is not possible as the object needs to be non-nested top-level.
 // object Issue001:
-//   def foo(x: Int): Spork[Int => Boolean] = Spork.apply[Int => Boolean] { y => y > x }
+//   def foo(x: Int): Spore[Int => Boolean] = Spore.apply[Int => Boolean] { y => y > x }
 
 @RunWith(classOf[JUnit4])
-class SporkLambdaErrorTests:
+class SporeLambdaErrorTests:
 
   @Test
   def testInvalidCaptureIdent(): Unit =
@@ -24,21 +24,21 @@ class SporkLambdaErrorTests:
       typeCheckErrors:
         """
         val y = 12
-        Spork.apply[Int => Int] { x => x + y }
+        Spore.apply[Int => Int] { x => x + y }
         """
       .contains:
         """
-        Invalid capture of variable `y`. Use the first parameter of a spork's body to refer to the spork's environment.
+        Invalid capture of variable `y`. Use the first parameter of a spore's body to refer to the spore's environment.
         """.trim()
 
     assertTrue:
       typeCheckErrors:
         """
-        Spork.apply[Int => Int] { x => Spork.apply[Int => Int] { y => x + y }.unwrap().apply(x) }
+        Spore.apply[Int => Int] { x => Spore.apply[Int => Int] { y => x + y }.unwrap().apply(x) }
         """
       .contains:
         """
-        Invalid capture of variable `x`. Use the first parameter of a spork's body to refer to the spork's environment.
+        Invalid capture of variable `x`. Use the first parameter of a spore's body to refer to the spore's environment.
         """.trim()
 
   @Test
@@ -46,22 +46,22 @@ class SporkLambdaErrorTests:
     assertTrue:
       typeCheckErrors:
         """
-        def fun(x: Int): Spork[Int => Boolean] = Spork.apply[Int => Boolean] { y => y > x }
+        def fun(x: Int): Spore[Int => Boolean] = Spore.apply[Int => Boolean] { y => y > x }
         """
       .contains:
         """
-        Invalid capture of variable `x`. Use the first parameter of a spork's body to refer to the spork's environment.
+        Invalid capture of variable `x`. Use the first parameter of a spore's body to refer to the spore's environment.
         """.trim()
 
     assertTrue:
       typeCheckErrors:
         """
         object ShouldFail:
-          def fun(x: Int): Spork[Int => Boolean] = Spork.apply[Int => Boolean] { y => y > x }
+          def fun(x: Int): Spore[Int => Boolean] = Spore.apply[Int => Boolean] { y => y > x }
         """
       .contains:
         """
-        Invalid capture of variable `x`. Use the first parameter of a spork's body to refer to the spork's environment.
+        Invalid capture of variable `x`. Use the first parameter of a spore's body to refer to the spore's environment.
         """.trim()
 
   val captureMeIfYouCan = 12
@@ -72,7 +72,7 @@ class SporkLambdaErrorTests:
       typeCheckErrors:
         """
         class TestClass {
-          Spork.apply { () => this.toString() }.unwrap()
+          Spore.apply { () => this.toString() }.unwrap()
         }
         (new TestClass())
         """
@@ -86,7 +86,7 @@ class SporkLambdaErrorTests:
         """
         class Outer:
           val x = 12
-          Spork.apply { () => 42 * x }.unwrap()
+          Spore.apply { () => 42 * x }.unwrap()
         (new Outer())
         """
       .contains:
@@ -97,9 +97,9 @@ class SporkLambdaErrorTests:
     assertTrue:
       typeCheckErrors:
         """
-        Spork.apply { () => 42 * captureMeIfYouCan }.unwrap()
+        Spore.apply { () => 42 * captureMeIfYouCan }.unwrap()
         """
       .contains:
         """
-        Invalid capture of `this` from class SporkLambdaErrorTests.
+        Invalid capture of `this` from class SporeLambdaErrorTests.
         """.trim()

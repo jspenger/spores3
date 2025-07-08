@@ -1,4 +1,4 @@
-package sporks
+package spores
 
 object TestUtils {
 

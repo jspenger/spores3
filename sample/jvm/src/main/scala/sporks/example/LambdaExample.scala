@@ -1,33 +1,33 @@
-package sporks.example
+package spores.example
 
-import sporks.*
-import sporks.given
-import sporks.jvm.*
-import sporks.example.platform.*
+import spores.*
+import spores.given
+import spores.jvm.*
+import spores.example.platform.*
 
 
 object LambdaExample {
 
-  val Lambda1 = Spork.apply[Int => String] { x => x.toString.reverse }
+  val Lambda1 = Spore.apply[Int => String] { x => x.toString.reverse }
 
-  val Lambda2 = Spork.applyWithEnv[Int, Int => String](12) { env => x => (env + x).toString.reverse }
+  val Lambda2 = Spore.applyWithEnv[Int, Int => String](12) { env => x => (env + x).toString.reverse }
 
-  val Lambda3 = Spork.apply[Option[Int] => Int] { x => x.map { _ + 1 }.getOrElse(0) }
+  val Lambda3 = Spore.apply[Option[Int] => Int] { x => x.map { _ + 1 }.getOrElse(0) }
 
-  val Lambda4 = Spork.applyWithCtx[Int, Int](14) { summon[Int] }
+  val Lambda4 = Spore.applyWithCtx[Int, Int](14) { summon[Int] }
 
   // // Should cause compile error
   // object ShouldFail:
-  //   Spork.apply[Int => Int] { x =>
-  //     Spork.apply[Int => Int] { y =>
-  //       // Invalid capture of variable `x`. Use the first parameter of a spork's body to refer to the spork's environment.
+  //   Spore.apply[Int => Int] { x =>
+  //     Spore.apply[Int => Int] { y =>
+  //       // Invalid capture of variable `x`. Use the first parameter of a spore's body to refer to the spore's environment.
   //       x + y
   //     }.unwrap().apply(x)
   //   }
 
   // // Should cause compile error
   // import upickle.default.*
-  // def SporkFactoryFail[T: ReadWriter] = Spork.apply { summon[ReadWriter[T]] } // Invalid capture of variable `evidence$1`. Use the first parameter of a spork's body to refer to the spork's environment.
+  // def SporeFactoryFail[T: ReadWriter] = Spore.apply { summon[ReadWriter[T]] } // Invalid capture of variable `evidence$1`. Use the first parameter of a spore's body to refer to the spore's environment.
 
 
   def main(args: Array[String]): Unit = {
@@ -53,22 +53,22 @@ object LambdaExample {
 
     writeToFile(Lambda1, "Lambda1.json")
     println(
-      readFromFile[Spork[Int => String]]("Lambda1.json")
+      readFromFile[Spore[Int => String]]("Lambda1.json")
     )
 
     writeToFile(Lambda2, "Lambda2.json")
     println(
-      readFromFile[Spork[Int => String]]("Lambda2.json")
+      readFromFile[Spore[Int => String]]("Lambda2.json")
     )
 
     writeToFile(Lambda3, "Lambda3.json")
     println(
-      readFromFile[Spork[Option[Int] => Int]]("Lambda3.json")
+      readFromFile[Spore[Option[Int] => Int]]("Lambda3.json")
     )
 
     writeToFile(Lambda3.withEnv(Some(42)), "Lambda3WithEnv.json")
     println(
-      readFromFile[Spork[Int]]("Lambda3WithEnv.json")
+      readFromFile[Spore[Int]]("Lambda3WithEnv.json")
     )
 
   }

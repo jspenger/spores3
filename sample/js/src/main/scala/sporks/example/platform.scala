@@ -1,4 +1,4 @@
-package sporks.example
+package spores.example
 
 package platform
 

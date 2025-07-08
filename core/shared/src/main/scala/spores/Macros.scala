@@ -1,10 +1,10 @@
-package sporks
+package spores
 
 import scala.quoted.*
 
-private[sporks] object Macros {
+private[spores] object Macros {
 
-  private[sporks] def findCapturedIds(using Quotes)(tree: quotes.reflect.Term): List[quotes.reflect.Tree] = {
+  private[spores] def findCapturedIds(using Quotes)(tree: quotes.reflect.Term): List[quotes.reflect.Tree] = {
     import quotes.reflect.*
 
     def findMaybeOwners(tree: Tree): List[Symbol] = {
@@ -121,7 +121,7 @@ private[sporks] object Macros {
   }
 
 
-  private[sporks] def checkBodyExpr[T](bodyExpr: Expr[T])(using Quotes): Unit = {
+  private[spores] def checkBodyExpr[T](bodyExpr: Expr[T])(using Quotes): Unit = {
     import quotes.reflect.*
 
     val foundIds = findCapturedIds(bodyExpr.asTerm)
@@ -136,14 +136,14 @@ private[sporks] object Macros {
         }
         case _ => {
           val sym = tree.symbol
-          report.error(s"Invalid capture of variable `${sym.name}`. Use the first parameter of a spork's body to refer to the spork's environment.", tree.pos)
+          report.error(s"Invalid capture of variable `${sym.name}`. Use the first parameter of a spore's body to refer to the spore's environment.", tree.pos)
         }
       }
     }
   }
 
 
-  private[sporks] def isTopLevelObject[T](builderExpr: Expr[T])(using Type[T], Quotes): Expr[Unit] = {
+  private[spores] def isTopLevelObject[T](builderExpr: Expr[T])(using Type[T], Quotes): Expr[Unit] = {
     import quotes.reflect.*
 
     // Here we check the following to ensure that it works on Scala.js and Scala Native:
@@ -164,17 +164,17 @@ private[sporks] object Macros {
     val owner = sym.maybeOwner
 
     if (!isObject(sym)) {
-      report.error(s"The provided SporkBuilder `${sym.fullName}` is not an object.")
+      report.error(s"The provided SporeBuilder `${sym.fullName}` is not an object.")
     }
     if (!allOwnersOK(owner)) {
-      report.error(s"The provided SporkBuilder `${sym.fullName}` is not a top-level object; its owner `${owner.name}` is not a top-level object nor a package.")
+      report.error(s"The provided SporeBuilder `${sym.fullName}` is not a top-level object; its owner `${owner.name}` is not a top-level object nor a package.")
     }
 
     '{ () }
   }
 
 
-  private[sporks] def isTopLevelClass[T](builderExpr: Expr[T])(using Type[T], Quotes): Expr[Unit] = {
+  private[spores] def isTopLevelClass[T](builderExpr: Expr[T])(using Type[T], Quotes): Expr[Unit] = {
     import quotes.reflect.*
 
     // Here we check the following to ensure that it works on Scala.js and Scala Native:
@@ -224,26 +224,26 @@ private[sporks] object Macros {
     val sym = builderTpe.typeSymbol
 
     if (!isClass(sym)) {
-      report.error(s"The provided SporkClassBuilder `${sym.fullName}` is not a class.")
+      report.error(s"The provided SporeClassBuilder `${sym.fullName}` is not a class.")
     }
     if (!isConcrete(sym)) {
-      report.error(s"The provided SporkClassBuilder `${sym.fullName}` is not a concrete class.")
+      report.error(s"The provided SporeClassBuilder `${sym.fullName}` is not a concrete class.")
     }
     val constructor = sym.primaryConstructor
     if (!isPublic(constructor)) {
-      report.error(s"The provided SporkClassBuilder `${sym.fullName}` `${constructor.name}` does not have a public constructor.")
+      report.error(s"The provided SporeClassBuilder `${sym.fullName}` `${constructor.name}` does not have a public constructor.")
     }
     if (!isNotLocal(sym)) {
-      report.error(s"The provided SporkClassBuilder `${sym.fullName}` is a local class.")
+      report.error(s"The provided SporeClassBuilder `${sym.fullName}` is a local class.")
     }
     if (!isNotNestedInClass(sym.maybeOwner)) {
-      report.error(s"The provided SporkClassBuilder `${sym.fullName}` is nested in a class.")
+      report.error(s"The provided SporeClassBuilder `${sym.fullName}` is nested in a class.")
     }
     if (!containsEmptyParamList(constructor)) {
-      report.error(s"The constructor of the provided SporkClassBuilder `${sym.fullName}` `${constructor.name}` does not have an empty parameter list.")
+      report.error(s"The constructor of the provided SporeClassBuilder `${sym.fullName}` `${constructor.name}` does not have an empty parameter list.")
     }
     if (containsContextParamList(constructor)) {
-      report.error(s"The constructor of the provided SporkClassBuilder `${sym.fullName}` `${constructor.name}` contains a context parameter list.")
+      report.error(s"The constructor of the provided SporeClassBuilder `${sym.fullName}` `${constructor.name}` contains a context parameter list.")
     }
 
     '{ () }

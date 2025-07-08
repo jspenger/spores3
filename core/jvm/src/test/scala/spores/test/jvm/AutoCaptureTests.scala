@@ -1,4 +1,4 @@
-package sporks.jvm
+package spores.jvm
 
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -7,27 +7,27 @@ import org.junit.Assert.*
 
 import upickle.default.*
 
-import sporks.*
-import sporks.given
-import sporks.TestUtils.*
+import spores.*
+import spores.given
+import spores.TestUtils.*
 
 
 object AutoCaptureTests {
 
   case class Foo(x: Int, y: Int)
 
-  inline def writeReadUnwrap[T](s: Spork[T]): T = {
+  inline def writeReadUnwrap[T](s: Spore[T]): T = {
     val w = write(s)
-    val r = read[Spork[T]](w)
+    val r = read[Spore[T]](w)
     r.unwrap()
   }
 
   inline def readUnwrap[T](json: String): T = {
-    val r = read[Spork[T]](json)
+    val r = read[Spore[T]](json)
     r.unwrap()
   }
 
-  inline def countCapturedInSpork[T](s: Spork[T], captured: String): Int = {
+  inline def countCapturedInSpore[T](s: Spore[T], captured: String): Int = {
     // Note: the `captured` String should otherwise not occur in the JSON.
     val length = captured.length
     val json = write(s)
@@ -50,12 +50,12 @@ object AutoCaptureTests {
       case Node(left, right) => f(reduce(left, f), reduce(right, f))
     }
   }
-  object TreeRW extends SporkBuilder[ReadWriter[Tree[Int]]]({ macroRW })
-  object LeafRW extends SporkBuilder[ReadWriter[Leaf[Int]]]({ macroRW })
-  object NodeRW extends SporkBuilder[ReadWriter[Node[Int]]]({ macroRW })
-  given treeRW: Spork[ReadWriter[Tree[Int]]] = TreeRW.pack()
-  given leafRW: Spork[ReadWriter[Leaf[Int]]] = LeafRW.pack()
-  given nodeRW: Spork[ReadWriter[Node[Int]]] = NodeRW.pack()
+  object TreeRW extends SporeBuilder[ReadWriter[Tree[Int]]]({ macroRW })
+  object LeafRW extends SporeBuilder[ReadWriter[Leaf[Int]]]({ macroRW })
+  object NodeRW extends SporeBuilder[ReadWriter[Node[Int]]]({ macroRW })
+  given treeRW: Spore[ReadWriter[Tree[Int]]] = TreeRW.pack()
+  given leafRW: Spore[ReadWriter[Leaf[Int]]] = LeafRW.pack()
+  given nodeRW: Spore[ReadWriter[Node[Int]]] = NodeRW.pack()
 
   class TopLevel {
     def x: Int = 4
@@ -101,16 +101,16 @@ class AutoCaptureTests {
     assertEquals("hello" + a1 + a2 + a3, unwrapped3("hello"))
     assertEquals("hello" + a1 + a2 + a3 + a4, unwrapped4("hello"))
 
-    assertEquals(1, countCapturedInSpork(fun1, a1))
-    assertEquals(1, countCapturedInSpork(fun2, a1))
-    assertEquals(1, countCapturedInSpork(fun2, a2))
-    assertEquals(1, countCapturedInSpork(fun3, a1))
-    assertEquals(1, countCapturedInSpork(fun3, a2))
-    assertEquals(1, countCapturedInSpork(fun3, a3))
-    assertEquals(1, countCapturedInSpork(fun4, a1))
-    assertEquals(1, countCapturedInSpork(fun4, a2))
-    assertEquals(1, countCapturedInSpork(fun4, a3))
-    assertEquals(1, countCapturedInSpork(fun4, a4))
+    assertEquals(1, countCapturedInSpore(fun1, a1))
+    assertEquals(1, countCapturedInSpore(fun2, a1))
+    assertEquals(1, countCapturedInSpore(fun2, a2))
+    assertEquals(1, countCapturedInSpore(fun3, a1))
+    assertEquals(1, countCapturedInSpore(fun3, a2))
+    assertEquals(1, countCapturedInSpore(fun3, a3))
+    assertEquals(1, countCapturedInSpore(fun4, a1))
+    assertEquals(1, countCapturedInSpore(fun4, a2))
+    assertEquals(1, countCapturedInSpore(fun4, a3))
+    assertEquals(1, countCapturedInSpore(fun4, a4))
   }
 
   @Test
@@ -127,15 +127,15 @@ class AutoCaptureTests {
     }
     val unwrapped = writeReadUnwrap(fun)
     assertEquals("0123456789" + c + c + c + c, unwrapped("0123456789"))
-    assertEquals(1, countCapturedInSpork(fun, c))
+    assertEquals(1, countCapturedInSpore(fun, c))
   }
 
   @Test
   def testReadFun0123(): Unit = {
-    val json0 = """{"$type":"sporks.Packed.PackedLambda","fun":"sporks.jvm.AutoCaptureTests$FunctionsToReadFromJSON$Lambda$16"}"""
-    val json1 = """{"$type":"sporks.Packed.PackedWithEnv","packed":{"$type":"sporks.Packed.PackedLambda","fun":"sporks.jvm.AutoCaptureTests$FunctionsToReadFromJSON$Lambda$17"},"packedEnv":{"$type":"sporks.Packed.PackedEnv","env":"\"0123456789-1\"","rw":{"$type":"sporks.Packed.PackedObject","fun":"sporks.ReadWriters$StringRW$"}}}"""
-    val json2 = """{"$type":"sporks.Packed.PackedWithEnv","packed":{"$type":"sporks.Packed.PackedWithEnv","packed":{"$type":"sporks.Packed.PackedLambda","fun":"sporks.jvm.AutoCaptureTests$FunctionsToReadFromJSON$Lambda$18"},"packedEnv":{"$type":"sporks.Packed.PackedEnv","env":"\"0123456789-1\"","rw":{"$type":"sporks.Packed.PackedObject","fun":"sporks.ReadWriters$StringRW$"}}},"packedEnv":{"$type":"sporks.Packed.PackedEnv","env":"\"0123456789-2\"","rw":{"$type":"sporks.Packed.PackedObject","fun":"sporks.ReadWriters$StringRW$"}}}"""
-    val json3 = """{"$type":"sporks.Packed.PackedWithEnv","packed":{"$type":"sporks.Packed.PackedWithEnv","packed":{"$type":"sporks.Packed.PackedWithEnv","packed":{"$type":"sporks.Packed.PackedLambda","fun":"sporks.jvm.AutoCaptureTests$FunctionsToReadFromJSON$Lambda$19"},"packedEnv":{"$type":"sporks.Packed.PackedEnv","env":"\"0123456789-1\"","rw":{"$type":"sporks.Packed.PackedObject","fun":"sporks.ReadWriters$StringRW$"}}},"packedEnv":{"$type":"sporks.Packed.PackedEnv","env":"\"0123456789-2\"","rw":{"$type":"sporks.Packed.PackedObject","fun":"sporks.ReadWriters$StringRW$"}}},"packedEnv":{"$type":"sporks.Packed.PackedEnv","env":"[\"a\",\"b\",\"c\"]","rw":{"$type":"sporks.Packed.PackedWithCtx","packed":{"$type":"sporks.Packed.PackedClass","fun":"sporks.ReadWriters$ListRW"},"packedEnv":{"$type":"sporks.Packed.PackedObject","fun":"sporks.ReadWriters$StringRW$"}}}}"""
+    val json0 = """{"$type":"spores.Packed.PackedLambda","fun":"spores.jvm.AutoCaptureTests$FunctionsToReadFromJSON$Lambda$16"}"""
+    val json1 = """{"$type":"spores.Packed.PackedWithEnv","packed":{"$type":"spores.Packed.PackedLambda","fun":"spores.jvm.AutoCaptureTests$FunctionsToReadFromJSON$Lambda$17"},"packedEnv":{"$type":"spores.Packed.PackedEnv","env":"\"0123456789-1\"","rw":{"$type":"spores.Packed.PackedObject","fun":"spores.ReadWriters$StringRW$"}}}"""
+    val json2 = """{"$type":"spores.Packed.PackedWithEnv","packed":{"$type":"spores.Packed.PackedWithEnv","packed":{"$type":"spores.Packed.PackedLambda","fun":"spores.jvm.AutoCaptureTests$FunctionsToReadFromJSON$Lambda$18"},"packedEnv":{"$type":"spores.Packed.PackedEnv","env":"\"0123456789-1\"","rw":{"$type":"spores.Packed.PackedObject","fun":"spores.ReadWriters$StringRW$"}}},"packedEnv":{"$type":"spores.Packed.PackedEnv","env":"\"0123456789-2\"","rw":{"$type":"spores.Packed.PackedObject","fun":"spores.ReadWriters$StringRW$"}}}"""
+    val json3 = """{"$type":"spores.Packed.PackedWithEnv","packed":{"$type":"spores.Packed.PackedWithEnv","packed":{"$type":"spores.Packed.PackedWithEnv","packed":{"$type":"spores.Packed.PackedLambda","fun":"spores.jvm.AutoCaptureTests$FunctionsToReadFromJSON$Lambda$19"},"packedEnv":{"$type":"spores.Packed.PackedEnv","env":"\"0123456789-1\"","rw":{"$type":"spores.Packed.PackedObject","fun":"spores.ReadWriters$StringRW$"}}},"packedEnv":{"$type":"spores.Packed.PackedEnv","env":"\"0123456789-2\"","rw":{"$type":"spores.Packed.PackedObject","fun":"spores.ReadWriters$StringRW$"}}},"packedEnv":{"$type":"spores.Packed.PackedEnv","env":"[\"a\",\"b\",\"c\"]","rw":{"$type":"spores.Packed.PackedWithCtx","packed":{"$type":"spores.Packed.PackedClass","fun":"spores.ReadWriters$ListRW"},"packedEnv":{"$type":"spores.Packed.PackedObject","fun":"spores.ReadWriters$StringRW$"}}}}"""
 
     val a1 = "0123456789-1"
     val a2 = "0123456789-2"
