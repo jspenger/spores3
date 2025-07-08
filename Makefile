@@ -43,34 +43,3 @@ sandbox:
 	mkdir -p .sandbox
 	rsync -a . .sandbox --exclude='.sandbox'
 	cd .sandbox && $(MAKE) clean && $(MAKE) build && $(MAKE) test && $(MAKE) test-sample
-
-VERSIONS = 3.3.6 \
-	3.4.3 \
-	3.5.2 \
-	3.6.4 \
-	3.7.1
-
-.PHONY: cross-sandbox
-
-cross-sandbox:
-	set -e -x -o pipefail; \
-	rm -rf .sandbox; \
-	mkdir -p .sandbox; \
-	rsync -a . .sandbox --exclude='.sandbox'; \
-	cd .sandbox; \
-	set -e -x -o pipefail; \
-	for version in $(VERSIONS); do \
-		$(MAKE) clean; \
-		sbt -Dsbt.server=false ++$${version}! -v compile; \
-		sbt -Dsbt.server=false ++$${version}! -v test:compile; \
-		sbt -Dsbt.server=false ++$${version}! -v test; \
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.BuilderExample" ;\
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.LambdaExample" ;\
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.AutoCaptureExample" ;\
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.AgentMain" ;\
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.Futures" ;\
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.FutureMap" ;\
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.ParallelTreeReduction" ;\
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJS / run" ;\
-		sbt -Dsbt.server=false ++$${version}! -v "sampleNative / run" ;\
-	done
