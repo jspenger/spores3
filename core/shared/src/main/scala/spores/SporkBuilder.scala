@@ -28,7 +28,7 @@ import sporks.Packed.*
   * @param fun
   *   The wrapped closure.
   */
-@Reflect.EnableReflectiveInstantiation
+@Reflection.EnableReflectiveInstantiation
 trait SporkBuilder[+T](private[sporks] val fun: T) {
 
   /** Packs the wrapped closure into a [[Spork]] of type `T`.

@@ -131,9 +131,9 @@ sealed trait Spork[+T] {
     */
   def unwrap(): T = {
     this match
-      case PackedObject(fun) => Reflect.getModuleFieldValue[SporkBuilder[T]](fun).fun
-      case PackedClass(fun)  => Reflect.getClassInstance[SporkClassBuilder[T]](fun).fun
-      case PackedLambda(fun) => Reflect.getClassInstance[SporkLambdaBuilder[T]](fun).fun
+      case PackedObject(fun) => Reflection.getModuleFieldValue[SporkBuilder[T]](fun).fun
+      case PackedClass(fun)  => Reflection.getClassInstance[SporkClassBuilder[T]](fun).fun
+      case PackedLambda(fun) => Reflection.getClassInstance[SporkLambdaBuilder[T]](fun).fun
       case PackedEnv(env, rw) => read(env)(using rw.unwrap())
       case PackedWithEnv(packed, packedEnv) => packed.unwrap()(packedEnv.unwrap())
       case PackedWithCtx(packed, packedEnv) => packed.unwrap()(using packedEnv.unwrap())
