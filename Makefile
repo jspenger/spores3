@@ -68,6 +68,7 @@ cross-test:
 	done
 
 .PHONY: cross-test-sample
+
 cross-test-sample:
 	/usr/bin/env bash -e -x -o pipefail -c; \
 	for version in $(VERSIONS); do \
