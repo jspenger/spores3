@@ -1,8 +1,8 @@
-package spores.example
+package spores.sample
 
 import spores.*
 import spores.given
-import spores.example.platform.*
+import spores.sample.platform.*
 
 
 object BuilderExample {

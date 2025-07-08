@@ -1,4 +1,4 @@
-package spores.example
+package spores.sample
 
 import upickle.default.*
 
