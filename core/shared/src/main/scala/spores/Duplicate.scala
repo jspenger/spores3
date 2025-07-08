@@ -5,24 +5,23 @@ sealed trait Duplicate[T] {
   def unwrap(): T
 }
 
+private case class DuplicateLambda[T](fun: T) extends Duplicate[T] {
+  def unwrap(): T = fun
+}
+
+private case class DuplicateEnv[T](env: T, duplicable: Duplicable[T]) extends Duplicate[T] {
+  def unwrap(): T = env
+}
+
+private case class DuplicateWithEnv[E, T](fun: Duplicate[E => T], env: Duplicate[E]) extends Duplicate[T] {
+  def unwrap(): T = fun.unwrap().apply(env.unwrap())
+}
+
+private case class DuplicateWithCtx[E, T](fun: Duplicate[E ?=> T], env: Duplicate[E]) extends Duplicate[T] {
+  def unwrap(): T = fun.unwrap().apply(using env.unwrap())
+}
 
 object Duplicate {
-
-  private case class DuplicateLambda[T](fun: T) extends Duplicate[T] {
-    def unwrap(): T = fun
-  }
-
-  private case class DuplicateEnv[T](env: T, duplicable: Duplicable[T]) extends Duplicate[T] {
-    def unwrap(): T = env
-  }
-
-  private case class DuplicateWithEnv[E, T](fun: Duplicate[E => T], env: Duplicate[E]) extends Duplicate[T] {
-    def unwrap(): T = fun.unwrap().apply(env.unwrap())
-  }
-
-  private case class DuplicateWithCtx[E, T](fun: Duplicate[E ?=> T], env: Duplicate[E]) extends Duplicate[T] {
-    def unwrap(): T = fun.unwrap().apply(using env.unwrap())
-  }
 
   import scala.quoted.*
 
