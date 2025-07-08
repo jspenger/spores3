@@ -2,7 +2,7 @@ package spores
 
 import upickle.default.*
 
-import spores.Reflect
+import spores.Reflection
 import spores.Packed.*
 
 

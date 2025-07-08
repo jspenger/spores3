@@ -131,9 +131,9 @@ sealed trait Spore[+T] {
     */
   def unwrap(): T = {
     this match
-      case PackedObject(fun) => Reflection.getModuleFieldValue[SporeBuilder[T]](fun).fun
-      case PackedClass(fun)  => Reflection.getClassInstance[SporeClassBuilder[T]](fun).fun
-      case PackedLambda(fun) => Reflection.getClassInstance[SporeLambdaBuilder[T]](fun).fun
+      case PackedObject(fun) => Reflection.loadModuleFieldValue[SporeBuilder[T]](fun).fun
+      case PackedClass(fun)  => Reflection.loadClassInstance[SporeClassBuilder[T]](fun).fun
+      case PackedLambda(fun) => Reflection.loadClassInstance[SporeLambdaBuilder[T]](fun).fun
       case PackedEnv(env, rw) => read(env)(using rw.unwrap())
       case PackedWithEnv(packed, packedEnv) => packed.unwrap()(packedEnv.unwrap())
       case PackedWithCtx(packed, packedEnv) => packed.unwrap()(using packedEnv.unwrap())
