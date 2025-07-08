@@ -5,7 +5,7 @@ import spores.given
 import spores.example.platform.*
 
 
-object Example {
+object BuilderExample {
 
   object Spore1 extends SporeBuilder[Int => String](x => x.toString.reverse)
 
