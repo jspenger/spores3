@@ -23,13 +23,18 @@ clean:
 test:
 	sbt -Dsbt.server=false -v test
 
-.PHONY: test-example
+.PHONY: test-sample
 
-test-example:
-	sbt -Dsbt.server=false -v "exampleJVM / runMain spores.example.Example"
-	sbt -Dsbt.server=false -v "exampleJVM / runMain spores.example.LambdaExample"
-	sbt -Dsbt.server=false -v "exampleJS / run"
-	sbt -Dsbt.server=false -v "exampleNative / run"
+test-sample:
+	sbt -Dsbt.server=false -v "sampleJVM / runMain spores.sample.BuilderExample"
+	sbt -Dsbt.server=false -v "sampleJVM / runMain spores.sample.LambdaExample"
+	sbt -Dsbt.server=false -v "sampleJVM / runMain spores.sample.AutoCaptureExample"
+	sbt -Dsbt.server=false -v "sampleJVM / runMain spores.sample.AgentMain"
+	sbt -Dsbt.server=false -v "sampleJVM / runMain spores.sample.Futures"
+	sbt -Dsbt.server=false -v "sampleJVM / runMain spores.sample.FutureMap"
+	sbt -Dsbt.server=false -v "sampleJVM / runMain spores.sample.ParallelTreeReduction"
+	sbt -Dsbt.server=false -v "sampleJS / run"
+	sbt -Dsbt.server=false -v "sampleNative / run"
 
 .PHONY: sandbox
 
@@ -37,7 +42,7 @@ sandbox:
 	rm -rf .sandbox
 	mkdir -p .sandbox
 	rsync -a . .sandbox --exclude='.sandbox'
-	cd .sandbox && $(MAKE) clean && $(MAKE) build && $(MAKE) test && $(MAKE) test-example
+	cd .sandbox && $(MAKE) clean && $(MAKE) build && $(MAKE) test && $(MAKE) test-sample
 
 VERSIONS = 3.3.6 \
 	3.4.3 \
@@ -62,14 +67,14 @@ cross-test:
 		sbt -Dsbt.server=false ++$${version}! -v test; \
 	done
 
-.PHONY: cross-test-example
-cross-test-example:
+.PHONY: cross-test-sample
+cross-test-sample:
 	/usr/bin/env bash -e -x -o pipefail -c; \
 	for version in $(VERSIONS); do \
-		sbt -Dsbt.server=false ++$${version}! -v "exampleJVM / runMain spores.example.Example"; \
-		sbt -Dsbt.server=false ++$${version}! -v "exampleJVM / runMain spores.example.LambdaExample"; \
-		sbt -Dsbt.server=false ++$${version}! -v "exampleJS / run"; \
-		sbt -Dsbt.server=false ++$${version}! -v "exampleNative / run"; \
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.Example"; \
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.LambdaExample"; \
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJS / run"; \
+		sbt -Dsbt.server=false ++$${version}! -v "sampleNative / run"; \
 	done
 
 .PHONY: cross-sandbox
@@ -78,7 +83,7 @@ cross-sandbox:
 	rm -rf .sandbox
 	mkdir -p .sandbox
 	rsync -a . .sandbox --exclude='.sandbox'
-	cd .sandbox && $(MAKE) clean && $(MAKE) cross-build && $(MAKE) cross-test && $(MAKE) cross-test-example
+	cd .sandbox && $(MAKE) clean && $(MAKE) cross-build && $(MAKE) cross-test && $(MAKE) cross-test-sample
 
 JVM_VERSIONS = 8.0.452-zulu 11.0.27-tem 17.0.15-tem 21.0.7-tem
 
