@@ -53,7 +53,7 @@ VERSIONS = 3.3.6 \
 .PHONY: cross-build
 
 cross-build:
-	/usr/bin/env bash -e -x -o pipefail -c; \
+	set -e -x -o pipefail; \
 	for version in $(VERSIONS); do \
 		sbt -Dsbt.server=false ++$${version}! -v compile; \
 		sbt -Dsbt.server=false ++$${version}! -v test:compile; \
@@ -62,7 +62,7 @@ cross-build:
 .PHONY: cross-test
 
 cross-test:
-	/usr/bin/env bash -e -x -o pipefail -c; \
+	set -e -x -o pipefail; \
 	for version in $(VERSIONS); do \
 		sbt -Dsbt.server=false ++$${version}! -v test; \
 	done
@@ -70,12 +70,17 @@ cross-test:
 .PHONY: cross-test-sample
 
 cross-test-sample:
-	/usr/bin/env bash -e -x -o pipefail -c; \
+	set -e -x -o pipefail; \
 	for version in $(VERSIONS); do \
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.Example"; \
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.LambdaExample"; \
-		sbt -Dsbt.server=false ++$${version}! -v "sampleJS / run"; \
-		sbt -Dsbt.server=false ++$${version}! -v "sampleNative / run"; \
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.BuilderExample" ;\
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.LambdaExample" ;\
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.AutoCaptureExample" ;\
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.AgentMain" ;\
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.Futures" ;\
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.FutureMap" ;\
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJVM / runMain spores.sample.ParallelTreeReduction" ;\
+		sbt -Dsbt.server=false ++$${version}! -v "sampleJS / run" ;\
+		sbt -Dsbt.server=false ++$${version}! -v "sampleNative / run" ;\
 	done
 
 .PHONY: cross-sandbox
@@ -91,12 +96,12 @@ JVM_VERSIONS = 8.0.452-zulu 11.0.27-tem 17.0.15-tem 21.0.7-tem
 .PHONY: paranoid
 
 paranoid:
-	/usr/bin/env bash -e -x -o pipefail -c; \
+	set -e -x -o pipefail; \
 	for jvm in $(JVM_VERSIONS); do \
 		echo "Testing with JAVA_HOME for JDK $${jvm}"; \
 		. "$$HOME/.sdkman/bin/sdkman-init.sh"; \
 		sdk use java $${jvm}; \
-		/usr/bin/env bash -e -x -o pipefail -c; \
+		set -e -x -o pipefail; \
 		java -version; \
 		$(MAKE) clean; \
 		$(MAKE) cross-sandbox; \
