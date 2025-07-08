@@ -1,0 +1,11 @@
+.DS_Store
+.metals
+.vscode
+.idea
+.bsp
+.bloop
+*.json
+metals.sbt
+project/project/
+target/
+.sandbox/
