@@ -6,41 +6,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.collection.concurrent.TrieMap
 
-import upickle.default.{ReadWriter, macroRW, readwriter}
-
-import spores.{Spore, SporeBuilder, Duplicable}
-import spores.jvm.Spore
+import spores.{Duplicate, Duplicable}
 import spores.Duplicable.duplicate
 
 
 case class Customer(name: String, customerNo: Int)
-
 case class CustomerInfo(customerNo: Int, age: Int, since: Int)
-
-object CustomerInfo {
-  given ReadWriter[CustomerInfo] = macroRW
-  object CustomerInfoRW extends SporeBuilder[ReadWriter[CustomerInfo]]({ summon })
-  given Spore[ReadWriter[CustomerInfo]] = CustomerInfoRW.pack()
-}
-
-type CustomerMap = TrieMap[Int, CustomerInfo]
-
-object CustomerMap {
-  given [K: ReadWriter, V: ReadWriter]: ReadWriter[TrieMap[K, V]] =
-    readwriter[Map[K, V]]
-      .bimap[TrieMap[K, V]](
-        trieMap => trieMap.toMap,
-        map => TrieMap.from(map)
-      )
-  object CustomerMapRW extends SporeBuilder[ReadWriter[CustomerMap]]({ summon })
-  given Spore[ReadWriter[CustomerMap]] = CustomerMapRW.pack()
-}
 
 given trieMapDuplicable[K, V]: Duplicable[TrieMap[K, V]] with
   def duplicate(map: TrieMap[K, V]) = map.snapshot()
 
 object FutureMap {
-  import CustomerMap.given
+
+  type CustomerMap = TrieMap[Int, CustomerInfo]
 
   val customerData = TrieMap.empty[Int, CustomerInfo]
 
@@ -56,7 +34,7 @@ object FutureMap {
     }
 
   def averageAge(customers: List[Customer]): Future[Float] = {
-    val spore = Spore.applyWithEnv[CustomerMap, List[Customer] => Float](customerData) { data => cs =>
+    val spore = Duplicate.applyWithEnv[CustomerMap, List[Customer] => Float](customerData) { data => cs =>
       val infos = cs.flatMap { c =>
         data.get(c.customerNo) match
           case Some(info) => List(info)
@@ -66,7 +44,7 @@ object FutureMap {
       if (infos.nonEmpty) sumAges / infos.size else 0.0f
     }
     val safeSpore = duplicate(spore)
-    Future { safeSpore.unwrap()(customers) }
+    Future { safeSpore.unwrap().apply(customers) }
   }
 
   def main(args: Array[String]): Unit = {
