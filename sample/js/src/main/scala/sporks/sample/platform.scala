@@ -1,5 +1,4 @@
 package spores.sample
-
 package platform
 
 import upickle.default.*
