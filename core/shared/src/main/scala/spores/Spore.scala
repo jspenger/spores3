@@ -31,7 +31,7 @@ import upickle.default.*
   * library.
   *
   * Compile-time macros guarantee that it is safe to create, serialize,
-  * deserialize, and unwrap the packed closure. Creating a Spore is gauranteed
+  * deserialize, and unwrap the packed closure. Creating a Spore is guaranteed
   * to not cause runtime errors. Serializing, deserializing, and unwrapping a
   * Spore is guaranteed to not cause runtime errors.
   *
