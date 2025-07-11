@@ -9,8 +9,8 @@ private[spores] object Reflection {
 
   def loadModuleFieldValue[T](name: String): T = {
     Reflect.lookupLoadableModuleClass(name) match {
-      case Some(loadableModuleClass) => {
-        loadableModuleClass.loadModule().asInstanceOf[T]
+      case Some(clazz) => {
+        clazz.loadModule().asInstanceOf[T]
       }
       case None => {
         throw new Exception(s"Module class $name not found")
@@ -20,8 +20,8 @@ private[spores] object Reflection {
 
   def loadClassInstance[T](name: String): T = {
     Reflect.lookupInstantiatableClass(name) match {
-      case Some(instansiableClass) => {
-        instansiableClass.newInstance().asInstanceOf[T]
+      case Some(clazz) => {
+        clazz.newInstance().asInstanceOf[T]
       }
       case None => {
         throw new Exception(s"Class $name not found")
