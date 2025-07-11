@@ -25,7 +25,7 @@ object AutoCaptureErrorTests {
   }
 
   // For some reason this doesn't cause any errors when using the
-  // `typeCheckErrors` method, but it does so here...
+  // `typeCheckErrorMessages` method, but it does so here...
   // class Outer { outer =>
   //   val y = 12
   //   class Inner {
@@ -42,7 +42,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCaptureIdentError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         val foo = Foo(12, 13)
         spauto { foo }
@@ -54,7 +54,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         val foo = Foo(12, 13)
         spauto { (x: Int) => x + foo.x + foo.y }
@@ -66,7 +66,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         val foo = Foo(12, 13)
         spauto { def bar(x: Int): Int = { x + foo.x } }
@@ -81,7 +81,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCaptureClassError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         class A(val a: Int)
         spauto { new A(12) }
@@ -93,7 +93,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         class A(val a: Int)
         spauto { (x: Int) => x + new A(12).a }
@@ -108,7 +108,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCaptureMethodError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         def captureMeIfYouCan(): Int = 12
         spauto { (x: Int) => x + captureMeIfYouCan() }
@@ -125,7 +125,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCaptureThisError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         spauto { this }
         """
@@ -136,7 +136,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         spauto { this.captureThisXIfYouCan }
         """
@@ -147,7 +147,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         spauto { (x: Int) => x + captureThisXIfYouCan }
         """
@@ -161,7 +161,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCaptureImplicitThisError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         case class Bar(x: Int, y: Int)
         given ReadWriter[Bar] = macroRW[Bar]
@@ -177,7 +177,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCaptureOpaqueTypeError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         val opaqueInt = OpaqueInt(12)
         spauto { (x: Int) => x + OpaqueInt.unwrap(opaqueInt) }
@@ -192,7 +192,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCapturedThisNestedClassError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         class Outer {
           class Inner {
@@ -208,7 +208,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         class Outer {
           val y = 12
@@ -224,7 +224,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         class Outer {
           val y = 12
@@ -243,7 +243,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCapturedIdentInClassError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         val foo = Foo(12, 13)
         spauto {
@@ -262,7 +262,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCapturedNewClassError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         class Bar(x: Int, y: Int)
         spauto { (x: Int) =>
@@ -276,7 +276,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         class Bar[T](x: T, y: T)
         spauto { (x: Int) =>
@@ -293,7 +293,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCapturedClassExtendsError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
           class Bar0
           spauto {
@@ -307,7 +307,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
           class Bar1(x: Int, y: Int)
           spauto {
@@ -321,7 +321,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
           class Bar2[T](x: T, y: T)
           spauto {
@@ -335,7 +335,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
           val x = 12
           trait Bar3 { def bar: Int = x }
@@ -350,7 +350,7 @@ class AutoCaptureErrorTests {
           """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
           trait Bar4[T] { def bar: Int = x }
           spauto {
@@ -367,7 +367,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCapturedTraitExtendsError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         trait Bar
         spauto {
@@ -384,7 +384,7 @@ class AutoCaptureErrorTests {
   @Test
   def testObjectExtendsCapturedError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         trait Bar
         spauto {
@@ -401,7 +401,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCapturedEnumError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         enum Bar { case Baz }
         spauto { Bar.Baz }
@@ -416,7 +416,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCapturedUnapplyError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         sealed trait Bar
         case class Baz(x: Int, y: Int) extends Bar
@@ -435,7 +435,7 @@ class AutoCaptureErrorTests {
   @Test
   def testCapturedThisSuperError(): Unit = {
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         class Bar extends Foo(12, 13) {
           def bar = spauto { (x: Int) => x.toString() + super.toString() }

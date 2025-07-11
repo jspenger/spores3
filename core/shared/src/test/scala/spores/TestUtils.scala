@@ -11,6 +11,6 @@ object TestUtils {
   inline def typeCheckFail(inline str: String): Boolean =
     !typeChecks(str)
 
-  inline def typeCheckErrors(inline str: String): List[String] =
+  inline def typeCheckErrorMessages(inline str: String): List[String] =
     typeCheckErrors(str).map(_.message)
 }

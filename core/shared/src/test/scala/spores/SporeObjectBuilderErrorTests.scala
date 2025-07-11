@@ -27,7 +27,7 @@ class SporeBuilderErrorTests:
   @Test
   def testClassSporeBuilderError(): Unit =
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         new NotObjObj().pack()
         """
@@ -37,7 +37,7 @@ class SporeBuilderErrorTests:
         """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         val notObjObj = new NotObjObj()
         notObjObj.pack()
@@ -50,7 +50,7 @@ class SporeBuilderErrorTests:
   @Test
   def testNotTopLevelError(): Unit =
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         val notTopLevel = new SomeClass().NotTopLevel
         notTopLevel.pack()
@@ -61,7 +61,7 @@ class SporeBuilderErrorTests:
         """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         val notObject = someMethod
         notObject.pack()
@@ -72,7 +72,7 @@ class SporeBuilderErrorTests:
         """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         object Builder extends SporeBuilder[Int => String](x => x.toString.reverse)
         Builder.pack()

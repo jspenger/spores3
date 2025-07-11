@@ -38,7 +38,7 @@ class SporeClassBuilderErrorTests:
   @Test
   def testObjectSporeClassBuilderError(): Unit =
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         NotClzClz.pack()
         """
@@ -48,7 +48,7 @@ class SporeClassBuilderErrorTests:
         """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         val notClzClz = NotClzClz
         notClzClz.pack()
@@ -61,7 +61,7 @@ class SporeClassBuilderErrorTests:
   @Test
   def testSporeClassBuilderNestedInClassError(): Unit =
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         val builder = new NestedBuilderInClass()
         val pred = new builder.Inner()
@@ -75,7 +75,7 @@ class SporeClassBuilderErrorTests:
   @Test
   def testSporeClassBuilderNestedInMethodError(): Unit =
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         someMethod.pack()
         """
@@ -87,7 +87,7 @@ class SporeClassBuilderErrorTests:
   @Test
   def testSporeClassBuilderWithPrivateConstructorError(): Unit =
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         ClassWithoutPublicConstructor().pack()
         """
@@ -99,7 +99,7 @@ class SporeClassBuilderErrorTests:
   @Test
   def testSporeClassBuilderWithParameterError(): Unit =
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         ClassWithParameters(10).pack()
         """
@@ -121,7 +121,7 @@ class SporeClassBuilderErrorTests:
     // summon[Spore[ReadWriter[Int]]].unwrap()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         given F[Int] = new F[Int]()
         ClassWithContext1[Int].pack()
@@ -132,7 +132,7 @@ class SporeClassBuilderErrorTests:
         """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         given F[Int] = new F[Int]()
         ClassWithContext2[Int].pack()
@@ -143,7 +143,7 @@ class SporeClassBuilderErrorTests:
         """.trim()
 
     assertTrue:
-      typeCheckErrors:
+      typeCheckErrorMessages:
         """
         given F[Int] = new F[Int]()
         ClassWithContext3[Int].pack()
