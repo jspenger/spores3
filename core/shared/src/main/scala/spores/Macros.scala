@@ -34,26 +34,22 @@ private[spores] object Macros {
 
     def findCaptures(anonfunBody: Tree): List[Tree] = {
 
-      def ownerChainContains(sym: Symbol, transitiveOwner: Symbol): Boolean = {
+      def ownerChainContains(sym: Symbol, transitiveOwner: Symbol): Boolean =
         if (sym.maybeOwner.isNoSymbol) false else ((sym.maybeOwner == transitiveOwner) || ownerChainContains(sym.maybeOwner, transitiveOwner))
-      }
 
-      def symIsToplevelObject(sym: Symbol): Boolean = {
+      def symIsToplevelObject(sym: Symbol): Boolean =
         sym.isNoSymbol || ((sym.flags.is(Flags.Module) || sym.flags.is(Flags.Package)) && symIsToplevelObject(sym.maybeOwner))
-      }
 
-      def isOwnedByToplevelObject(sym: Symbol): Boolean = {
+      def isOwnedByToplevelObject(sym: Symbol): Boolean =
         symIsToplevelObject(sym) || (!sym.maybeOwner.isNoSymbol) && symIsToplevelObject(sym.maybeOwner)
-      }
 
       // A symbol is owned by the spore if:
       // - it is owned by one of the maybeOwners of the spore
       // - it is a one of the maybeOwners of the spore
 
       val maybeOwners = findMaybeOwners(anonfunBody)
-      def isOwnedBySpore(sym: Symbol): Boolean = {
+      def isOwnedBySpore(sym: Symbol): Boolean =
         maybeOwners.exists(ownerChainContains(sym, _)) || maybeOwners.contains(sym)
-      }
 
       def isThis(tree: Tree): Boolean = {
         tree match {
@@ -128,16 +124,13 @@ private[spores] object Macros {
 
     foundIds.foreach { tree => 
       tree match {
-        case This(Some(qual)) => {
+        case This(Some(qual)) =>
           report.error(s"Invalid capture of `this` from class ${qual}.", tree.pos)
-        }
-        case This(None) => {
+        case This(None) =>
           report.error(s"Invalid capture of `this` from outer class.", tree.pos)
-        }
-        case _ => {
+        case _ =>
           val sym = tree.symbol
           report.error(s"Invalid capture of variable `${sym.name}`. Use the first parameter of a spore's body to refer to the spore's environment.", tree.pos)
-        }
       }
     }
   }
@@ -150,25 +143,21 @@ private[spores] object Macros {
     // See: https://github.com/portable-scala/portable-scala-reflect
     // > It must be "static", i.e., top-level or defined inside a static object
 
-    def isObject(sym: Symbol): Boolean = {
+    def isObject(sym: Symbol): Boolean =
       sym.flags.is(Flags.Module)
-    }
 
-    def allOwnersOK(owner: Symbol): Boolean = {
+    def allOwnersOK(owner: Symbol): Boolean =
       owner.isNoSymbol || ((owner.flags.is(Flags.Module) || owner.flags.is(Flags.Package)) && allOwnersOK(owner.maybeOwner))
-    }
 
     val tree = builderExpr.asTerm
     val builderTpe = tree.tpe
     val sym = builderTpe.typeSymbol
     val owner = sym.maybeOwner
 
-    if (!isObject(sym)) {
+    if (!isObject(sym))
       report.error(s"The provided SporeBuilder `${sym.fullName}` is not an object.")
-    }
-    if (!allOwnersOK(owner)) {
+    if (!allOwnersOK(owner))
       report.error(s"The provided SporeBuilder `${sym.fullName}` is not a top-level object; its owner `${owner.name}` is not a top-level object nor a package.")
-    }
 
     '{ () }
   }
@@ -188,63 +177,46 @@ private[spores] object Macros {
     // > It has a constructor with an empty parameter list.
     // > It has no context parameters in its parameter lists.
 
-    def isClass(sym: Symbol): Boolean = {
+    def isClass(sym: Symbol): Boolean =
       sym.isClassDef && !sym.flags.is(Flags.Module)
-    }
 
-    def isConcrete(sym: Symbol): Boolean = {
-      !sym.flags.is(Flags.Abstract)
-      && !sym.flags.is(Flags.Trait)
-      && !sym.flags.is(Flags.Sealed)
-    }
+    def isConcrete(sym: Symbol): Boolean =
+      !sym.flags.is(Flags.Abstract) && !sym.flags.is(Flags.Trait) && !sym.flags.is(Flags.Sealed)
 
-    def isPublic(sym: Symbol): Boolean = {
-      !sym.flags.is(Flags.Private)
-      && !sym.flags.is(Flags.Protected)
-    }
+    def isPublic(sym: Symbol): Boolean =
+      !sym.flags.is(Flags.Private) && !sym.flags.is(Flags.Protected)
 
-    def isNotLocal(owner: Symbol): Boolean = {
+    def isNotLocal(owner: Symbol): Boolean =
       owner.isNoSymbol || (!owner.flags.is(Flags.Method) && isNotLocal(owner.maybeOwner))
-    }
 
-    def isNotNestedInClass(owner: Symbol): Boolean = {
+    def isNotNestedInClass(owner: Symbol): Boolean =
       owner.isNoSymbol || (!(owner.isClassDef && !owner.flags.is(Flags.Module)) && isNotNestedInClass(owner.maybeOwner))
-    }
 
-    def containsEmptyParamList(sym: Symbol): Boolean = {
+    def containsEmptyParamList(sym: Symbol): Boolean =
       sym.paramSymss.isEmpty || sym.paramSymss.exists(_.isEmpty)
-    }
 
-    def containsContextParamList(sym: Symbol): Boolean = {
+    def containsContextParamList(sym: Symbol): Boolean =
       sym.paramSymss.exists(_.exists(x => x.flags.is(Flags.Implicit) || x.flags.is(Flags.Given)))
-    }
 
     val tree = builderExpr.asTerm
     val builderTpe = tree.tpe
     val sym = builderTpe.typeSymbol
 
-    if (!isClass(sym)) {
+    if (!isClass(sym))
       report.error(s"The provided SporeClassBuilder `${sym.fullName}` is not a class.")
-    }
-    if (!isConcrete(sym)) {
+    if (!isConcrete(sym))
       report.error(s"The provided SporeClassBuilder `${sym.fullName}` is not a concrete class.")
-    }
     val constructor = sym.primaryConstructor
-    if (!isPublic(constructor)) {
+    if (!isPublic(constructor))
       report.error(s"The provided SporeClassBuilder `${sym.fullName}` `${constructor.name}` does not have a public constructor.")
-    }
-    if (!isNotLocal(sym)) {
+    if (!isNotLocal(sym))
       report.error(s"The provided SporeClassBuilder `${sym.fullName}` is a local class.")
-    }
-    if (!isNotNestedInClass(sym.maybeOwner)) {
+    if (!isNotNestedInClass(sym.maybeOwner))
       report.error(s"The provided SporeClassBuilder `${sym.fullName}` is nested in a class.")
-    }
-    if (!containsEmptyParamList(constructor)) {
+    if (!containsEmptyParamList(constructor))
       report.error(s"The constructor of the provided SporeClassBuilder `${sym.fullName}` `${constructor.name}` does not have an empty parameter list.")
-    }
-    if (containsContextParamList(constructor)) {
+    if (containsContextParamList(constructor))
       report.error(s"The constructor of the provided SporeClassBuilder `${sym.fullName}` `${constructor.name}` contains a context parameter list.")
-    }
 
     '{ () }
   }
