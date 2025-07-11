@@ -26,7 +26,7 @@ object AutoCapture {
     *
     * The created Spore is safe to serialize and deserialize. If a captured
     * variable does not have an implicit `Spore[ReadWriter[T]]` in scope then it
-    * will cause a compiler error.
+    * will cause a compile error.
     *
     * @example
     *   {{{

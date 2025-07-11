@@ -27,7 +27,7 @@ object Spore {
   /** Create a Spore from the provided closure `fun`.
     *
     * The created Spore is safe to serialize and deserialize. The closure must
-    * not capture any variables, otherwise it will cause a compiler error.
+    * not capture any variables, otherwise it will cause a compile error.
     *
     * To capture variables, use [[applyWithEnv]], [[applyWithCtx]], or
     * [[spores.jvm.AutoCapture]] instead.
@@ -52,7 +52,7 @@ object Spore {
     * variable `env` as the first parameter of the closure.
     *
     * The created Spore is safe to serialize and deserialize. The closure must
-    * not capture any variables, otherwise it will cause a compiler error.
+    * not capture any variables, otherwise it will cause a compile error.
     *
     * @example
     *   {{{
@@ -80,7 +80,7 @@ object Spore {
     * variable `env` as the first implicit parameter of the closure.
     *
     * The created Spore is safe to serialize and deserialize. The closure must
-    * not capture any variables, otherwise it will cause a compiler error.
+    * not capture any variables, otherwise it will cause a compile error.
     *
     * @example
     *   {{{
