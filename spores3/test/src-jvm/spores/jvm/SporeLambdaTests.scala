@@ -1,12 +1,13 @@
 package spores.jvm
 
+import scala.language.implicitConversions
+
 import utest.*
 import upickle.default.*
 
-import spores.default.given
 import spores.default.*
+import spores.default.given
 import spores.conversions.given
-import spores.TestUtils.*
 
 
 object SporeLambdaTestsDefs {

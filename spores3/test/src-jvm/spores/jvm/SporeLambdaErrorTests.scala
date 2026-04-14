@@ -1,6 +1,6 @@
 package spores.jvm
 
-import utest._
+import utest.*
 
 import spores.default.given
 import spores.default.*

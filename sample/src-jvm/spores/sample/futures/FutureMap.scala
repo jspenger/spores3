@@ -3,7 +3,7 @@ package spores.sample
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
-
+import scala.language.implicitConversions
 import scala.collection.concurrent.TrieMap
 
 import spores.default.*

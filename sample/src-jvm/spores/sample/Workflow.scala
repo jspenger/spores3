@@ -103,7 +103,6 @@ object Workflow {
   private case class Value[Out, Err](
       value: Spore[Either[Err, Out]]
   ) extends Workflow[Nothing, Out, Err]
-      derives ReadWriter
 
   private object Value {
     given [Out, Err]: ReadWriter[Value[Out, Err]] = macroRW
@@ -117,7 +116,6 @@ object Workflow {
       spore: Spore[Tmp => Either[Err, Out]],
       rw: Spore[ReadWriter[Either[Err, Out]]]
   ) extends Workflow[Inp, Out, Err]
-      derives ReadWriter
 
   private object Map {
     given [Inp, Tmp, Out, ErrTmp, Err]: ReadWriter[Map[Inp, Tmp, Out, ErrTmp, Err]] = macroRW
@@ -164,7 +162,7 @@ object Workflow {
       // Write if fileSuffix is provided
       def maybeWrite(workflow: Workflow[Nothing, Any, Err], fileSuffix: Option[String], stepIndex: Int): Unit = {
         if fileSuffix.isDefined then
-          val filename = stepIndex + "-" + fileSuffix.get
+          val filename = stepIndex.toString() + "-" + fileSuffix.get
           writeToFile(workflow, filename)
       }
 
@@ -172,7 +170,7 @@ object Workflow {
       def rec[Inp, Out](inter: Workflow[Inp, Out, Err], fileSuffix: Option[String], stepIndex: Int): Either[Err, Out] = {
         maybeWrite(inter, fileSuffix, stepIndex)
         step(inter) match {
-          case Value(value) => if !inter.isInstanceOf[Value[_, _]] then maybeWrite(Value(value), fileSuffix, stepIndex + 1) // avoid writing twice in case inter is a Value
+          case Value(value) => if !inter.isInstanceOf[Value[?, ?]] then maybeWrite(Value(value), fileSuffix, stepIndex + 1) // avoid writing twice in case inter is a Value
                                value.get()
           case x            => rec(x, fileSuffix, stepIndex + 1)
         }

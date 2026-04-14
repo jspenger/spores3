@@ -382,7 +382,6 @@ private[spores] object Macros {
     val mode = res1._1
 
     val captureTerms = res1._2
-    val captureTermsDedup = deduplicateCaptures(captureTerms)
     val bodyCaptureTerms = findCapturedIds(bodyExpr.asTerm)
     val bodyCaptureTermsDedup = deduplicateCaptures(bodyCaptureTerms)
 

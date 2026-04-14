@@ -128,7 +128,7 @@ object ReadWriters {
   // Spore[ReadWriter[Spore[?]]]
   //////////////////////////////////////////////////////////////////////////////
 
-  private[spores] object SporeRW extends SporeBuilder[ReadWriter[Spore[_]]] {
+  private[spores] object SporeRW extends SporeBuilder[ReadWriter[Spore[?]]] {
     override def body = summon
   }
   given packedSporeRW[T]: Spore[ReadWriter[Spore[T]]] = SporeRW.build().asInstanceOf[Spore[ReadWriter[Spore[T]]]]

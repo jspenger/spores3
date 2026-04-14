@@ -1,6 +1,6 @@
 package spores.pickle.test
 
-import utest._
+import utest.*
 
 import upickle.default.*
 
@@ -10,8 +10,8 @@ import spores.default.given
 
 object PickleTests extends TestSuite {
 
-  extension (sp1: Spore[_]) {
-    def ===(sp2: Spore[_]): Boolean = {
+  extension (sp1: Spore[?]) {
+    def ===(sp2: Spore[?]): Boolean = {
       import Spore0.AST.*
 
       (sp1, sp2) match {

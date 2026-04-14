@@ -1,5 +1,7 @@
 package spores.sample
 
+import scala.language.implicitConversions
+
 import upickle.default.*
 
 import spores.default.*

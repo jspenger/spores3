@@ -1,9 +1,9 @@
 package spores
 
-import utest._
+import utest.*
 
-import spores.default.given
 import spores.default.*
+import spores.default.given
 import spores.TestUtils.*
 
 object SporeBuilderErrorTestsDefs {

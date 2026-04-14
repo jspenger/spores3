@@ -1,11 +1,12 @@
 package spores
 
-import utest._
+import scala.language.implicitConversions
 
-import spores.default.given
+import utest.*
+
 import spores.default.*
+import spores.default.given
 import spores.conversions.given
-import spores.TestUtils.*
 
 object SporeBuilderTestsDefs {
   object Thunk extends SporeBuilder[() => Int] {

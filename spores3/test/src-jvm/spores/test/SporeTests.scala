@@ -1,6 +1,6 @@
 package spores.test
 
-import utest._
+import utest.*
 
 import spores.Spore
 import spores.default.*

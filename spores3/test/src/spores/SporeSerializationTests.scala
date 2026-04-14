@@ -1,6 +1,6 @@
 package spores
 
-import utest._
+import utest.*
 import upickle.default.*
 
 import spores.default.*

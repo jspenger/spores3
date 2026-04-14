@@ -1,6 +1,5 @@
 package spores.pickle.test
 
-import spores.Reflection.EnableReflectiveInstantiation
 import spores.SporeBuilder
 
 

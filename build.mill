@@ -30,6 +30,17 @@ trait CommonMimaModule extends Mima {
   }
 }
 
+trait CommonOptionsModule extends ScalaModule {
+  override def scalacOptions = super.scalacOptions() ++ Seq(
+    "-encoding", "utf8",
+    "-deprecation",
+    "-feature",
+    "-unchecked",
+    "-source:future",
+    "-Werror",
+  )
+}
+
 trait CommonPublishModule extends ScalaModule with PublishModule with CommonMimaModule {
   def scalaVersion = scala3
   def publishVersion = "0.3.0-SNAPSHOT"
@@ -63,7 +74,7 @@ trait CommonPlatformModule extends ScalaModule with PlatformScalaModule {
 
 object spores3 extends Module {
 
-  trait Shared extends CommonPublishModule with CommonPlatformModule {
+  trait Shared extends CommonPublishModule with CommonPlatformModule with CommonOptionsModule {
     def artifactName = "spores3"
     def mvnDeps = Seq(mvn"com.lihaoyi::upickle::$upickle")
   }
@@ -85,7 +96,7 @@ object spores3 extends Module {
 
 object sample extends Module {
 
-  trait Shared extends ScalaModule with CommonPlatformModule {
+  trait Shared extends ScalaModule with CommonPlatformModule with CommonOptionsModule {
     def scalaVersion = scala3
     def mvnDeps = Seq(mvn"com.lihaoyi::upickle::$upickle")
   }

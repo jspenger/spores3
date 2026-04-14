@@ -1,7 +1,9 @@
 package spores
 package test
 
-import utest._
+import scala.language.implicitConversions
+
+import utest.*
 
 import spores.default.*
 import spores.default.given

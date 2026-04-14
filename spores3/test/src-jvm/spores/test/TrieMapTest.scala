@@ -1,8 +1,9 @@
 package spores.test
 
-import utest._
+import utest.*
 
 import scala.collection.concurrent.TrieMap
+import scala.language.implicitConversions
 
 import spores.default.*
 import spores.default.given
