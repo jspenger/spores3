@@ -37,5 +37,9 @@ object SampleJvmTests extends TestSuite {
     test("testForComprehension") {
       ForComprehension.main(Array())
     }
+
+    test("testSporeLocallyExamples") {
+      SporeLocallyExamples.main(Array())
+    }
   }
 }

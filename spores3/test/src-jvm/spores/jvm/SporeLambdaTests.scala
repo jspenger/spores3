@@ -349,5 +349,15 @@ object SporeLambdaTests extends TestSuite {
     //   val fun = spore.get()
     //   assert("12Hello" == fun(12))
     // }
+
+    test("testCaptureOuterMemberFromThis") {
+      class Outer:
+        val x = 12
+        def fun = Spore.apply(*) { () => 42 * x }
+      val outer = new Outer()
+      val fun = outer.fun
+      assert(42 * 12 == fun())
+      assert(42 * 12 == fun.get()())
+    }
   }
 }

@@ -4,14 +4,11 @@ import scala.concurrent.{Future, Await}
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import spores.default.*
-import spores.default.given
-import spores.conversions.given
+import spores.v03.*
+import spores.v03.given
 
 
 object Futures:
-  given [T]: Duplicable[Future[T]] with
-    def duplicate(fut: Future[T]): Future[T] = fut
 
   /**
     * Computes the nth Fibonacci number.
@@ -27,10 +24,10 @@ object Futures:
       val fut2 = fib(n - 2)
 
       // captured variables are passed explicitly to
-      // `applyWithEnv` method of `Spore` object
-      fut1.flatMap(Duplicable.applyWithEnv(fut2) { fut2 => (res1: Int) =>
-        fut2.map(Duplicable.applyWithEnv(res1) {
-          res1 => (res2: Int) => res1 + res2
+      // `apply` method of `Spore` object
+      fut1.flatMap(Spore(fut2) { (res1: Int) =>
+        fut2.map(Spore(res1) {
+          (res2: Int) => res1 + res2
         })
       })
 

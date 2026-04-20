@@ -97,7 +97,9 @@ private[spores] object Macros {
       }
       case Varargs(captures) => {
         val expanded = captures.map(c => expandInlined(c.asTerm)).toList
+
         if (expanded.exists(_.tpe <:< TypeRepr.of[Spore0.CaptureAllMode])) {
+          // If the capture list has size > 1 and contains a `*`.
           report.error("Invalid capture list.")
           (-1, List())
         } else {
@@ -108,6 +110,28 @@ private[spores] object Macros {
         report.error("Invalid capture list.")
         (-1, List())
       }
+    }
+  }
+
+
+  private[spores] def typeOf(using Quotes)(tree: quotes.reflect.Tree): quotes.reflect.TypeRepr = {
+    import quotes.reflect.*
+
+    tree match {
+      case x: TypeTree => x.tpe.widen
+      case x: Term     => x.tpe.widen
+    }
+  }
+
+
+  private[spores] def isSporeAnonClass(using Quotes)(classDef: quotes.reflect.ClassDef): Boolean = {
+    import quotes.reflect.*
+
+    classDef.parents.exists { p =>
+      val tpe = typeOf(p)
+
+      tpe <:< TypeRepr.of[spores.v03.SporeWithEnv[?, ?]] ||
+      tpe <:< TypeRepr.of[spores.v03.SporeWithoutEnv[?]]
     }
   }
 
@@ -142,11 +166,20 @@ private[spores] object Macros {
 
     def findCaptures(anonfunBody: Tree): List[Tree] = {
 
-      def ownerChainContains(sym: Symbol, transitiveOwner: Symbol): Boolean =
+      def ownerChainContains(sym: Symbol, transitiveOwner: Symbol): Boolean = {
         if (sym.maybeOwner.isNoSymbol) false else ((sym.maybeOwner == transitiveOwner) || ownerChainContains(sym.maybeOwner, transitiveOwner))
+      }
 
-      def symIsToplevelObject(sym: Symbol): Boolean =
-        sym.isNoSymbol || ((sym.flags.is(Flags.Module) || sym.flags.is(Flags.Package)) && symIsToplevelObject(sym.maybeOwner))
+      def symIsToplevelObject(sym: Symbol): Boolean = {
+        val symIsModule  = scala.util.Try(sym.flags.is(Flags.Module)).getOrElse(false)
+        val symIsPackage = scala.util.Try(sym.flags.is(Flags.Package)).getOrElse(false)
+
+        sym.isNoSymbol
+          || (
+            (symIsModule || symIsPackage)
+              && symIsToplevelObject(sym.maybeOwner)
+          )
+      }
 
       def isOwnedByToplevelObject(sym: Symbol): Boolean =
         symIsToplevelObject(sym) || (!sym.maybeOwner.isNoSymbol) && symIsToplevelObject(sym.maybeOwner)
@@ -166,7 +199,14 @@ private[spores] object Macros {
         }
       }
 
-      // Collect all identifiers which *could* be captured by the closure. This
+      def isLiteralThis(using Quotes)(t: quotes.reflect.This): Boolean = {
+        // Returns true if `this` is an explicit keyword in source, else (if it
+        // is synthetic) returns false. A synthetic `this` has a zero-width
+        // source position. [FIXME#20260424]
+        t.pos.end > t.pos.start
+      }
+
+      // Collect all identifiers that *could* be captured by the closure. This
       // will also collect identifiers which are not captured by the closure
       // such as identifiers owned by toplevel objects, etc. These are later
       // filtered out.
@@ -185,6 +225,8 @@ private[spores] object Macros {
 
       val acc = new TreeAccumulator[List[Tree]] {
         def foldTree(ids: List[Tree], tree: Tree)(owner: Symbol): List[Tree] = tree match {
+          case x @ Select(t @ This(_), _) if !isLiteralThis(t) =>
+            x :: ids // Capture the `Select` unless `This` is literal in source
           case x @ Ident(_) if !x.symbol.isType =>
             x :: ids
           case x @ This(_) =>
@@ -197,6 +239,8 @@ private[spores] object Macros {
           // - `class C extends T[U] with ...`
           // - `class C extends ... with T`
           // - `class C extends ... with T[U]`
+          case cd @ ClassDef(_, _, parents, _, _) if isSporeAnonClass(cd) =>
+            ids // Skip over instances of Spore class definitions
           case ClassDef(_, _, parents, _, _) =>
             // `parents`` are either `TypeTree`s or `Term` containing `New`.
             // Here we collect all `TypeIdent`s from `TypeTree`s. 
@@ -265,10 +309,7 @@ private[spores] object Macros {
     import quotes.reflect.*
 
     captures.flatMap { captured =>
-      val capturedTpe = captured match {
-        case x@ This(_) => captured.symbol.typeRef
-        case _       => captured.symbol.termRef.widen
-      }
+      val capturedTpe = typeOf(captured)
       val evidenceTpe = TypeRepr.of[[T] =>> Spore0[F, F[T]]].appliedTo(capturedTpe)
 
       Implicits.search(evidenceTpe) match {
@@ -298,6 +339,9 @@ private[spores] object Macros {
               subst.getOrElse(x.symbol, super.transformTerm(t)(o))
             case x@ This(_) =>
               subst.getOrElse(x.symbol, super.transformTerm(t)(o))
+            case x@ Select(This(_), _) =>
+              // Capture the `Select`
+              subst.getOrElse(x.symbol, super.transformTerm(t)(o))
             case _ =>
               super.transformTerm(t)(o)
         }
@@ -305,12 +349,9 @@ private[spores] object Macros {
       treeMap.transformTerm(body)(owner)
     }
 
-    def liftSymbolGroup(symGroup: List[Tree], body: Term): Term = {
-      val captureType = symGroup.head match {
-        case x@ This(_)  => x.symbol.typeRef.asType
-        case x@ _        => x.symbol.termRef.widen.asType
-      }
-      val bodyType = body.tpe.widen.asType
+    def liftCapture(capture: Tree, body: Term): Term = {
+      val captureType = typeOf(capture).asType
+      val bodyType    = typeOf(body).asType
 
       captureType match {
         case '[cType] => {
@@ -318,7 +359,7 @@ private[spores] object Macros {
             case '[bType] => {
               '{
                 (param: cType) => ${
-                  val subst = symGroup.map(_.symbol -> ('param).asTerm).toMap
+                  val subst = Map(capture.symbol -> ('param).asTerm)
                   substituteSymbols(subst, body).asExprOf[bType]
                 }
               }.asTerm
@@ -328,19 +369,14 @@ private[spores] object Macros {
       }
     }
 
-    def liftAllSymbolGroups(syms: List[List[Tree]], body: Term): Term = {
-      syms match {
+    def liftAll(captures: List[Tree], body: Term): Term = {
+      captures match {
+        case h :: t => liftCapture(h, liftAll(t, body))
         case Nil    => body
-        case h :: t => liftSymbolGroup(h, liftAllSymbolGroups(t, body))
       }
     }
 
-    def groupIdentifiersByFullName(captures: List[Tree]): List[(String, List[Tree])] = {
-      captures.groupBy(_.symbol.fullName).toList.sortBy(_._1)
-    }
-
-    val symbolGroup = groupIdentifiersByFullName(bodyCaptures).map(_._2)
-    liftAllSymbolGroups(symbolGroup, body)
+    liftAll(bodyCaptures, body)
   }
 
 
@@ -371,20 +407,26 @@ private[spores] object Macros {
   }
 
 
+  private[spores] def sortCaptures(using Quotes)(captures: List[quotes.reflect.Tree]): List[quotes.reflect.Tree] = {
+    captures.sortBy(_.symbol.fullName)
+  }
+
+
+  private[spores] def deduplicateCaptures(using Quotes)(captures: List[quotes.reflect.Tree]): List[quotes.reflect.Tree] = {
+    captures.distinctBy(_.symbol.fullName)
+  }
+
+
   private[spores] def spore0ApplyMacro[F[_], T](capturesExpr: Expr[Seq[Any]], bodyExpr: Expr[T])(using Type[F], Type[T], Quotes): Expr[Spore0[F, T]] = {
     import quotes.reflect.*
-
-    def deduplicateCaptures(captures: List[Tree]): List[Tree] = {
-      captures.groupBy(_.symbol.fullName).toList.sortBy(_._1).map(_._2.head)
-    }
 
     val res1 = capturesWellFormednessCheck(capturesExpr)
     val mode = res1._1
 
     val captureTerms = res1._2
-    val captureTermsDedup = deduplicateCaptures(captureTerms)
+    val captureTermsDedup = sortCaptures(deduplicateCaptures(captureTerms))
     val bodyCaptureTerms = findCapturedIds(bodyExpr.asTerm)
-    val bodyCaptureTermsDedup = deduplicateCaptures(bodyCaptureTerms)
+    val bodyCaptureTermsDedup = sortCaptures(deduplicateCaptures(bodyCaptureTerms))
 
     val evidence = findEvidence(bodyCaptureTermsDedup)
 

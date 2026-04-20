@@ -6,7 +6,7 @@ import spores.*
 sealed trait Spore0[F[_], +T] { self: Spore0[F, T] =>
   import Spore0.AST
 
-  
+
   /** Returns the value of the packed closure.
     *
     * @return

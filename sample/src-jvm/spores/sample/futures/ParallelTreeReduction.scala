@@ -6,9 +6,9 @@ import scala.concurrent.{Future, Await}
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 
-import spores.default.*
-import spores.default.given
-import spores.conversions.given
+import spores.v03.*
+import spores.v03.given
+import spores.v03.Duplicable.duplicate
 
 
 /**
@@ -70,7 +70,7 @@ object ParallelTreeReduction {
     * environment, is first duplicated. The created future only uses
     * and executes the duplicated block.
     */
-  def safeFuture[R](spore: Spore0[Duplicable, () => R]): Future[R] = {
+  def safeFuture[T, R](spore: Spore0[T, R])(using Duplicable[T]): Future[R] = {
     val safeSpore = duplicate(spore)
     Future { safeSpore() }
   }
@@ -99,12 +99,12 @@ object ParallelTreeReduction {
 
     case Branch(left, data, right) =>
 
-      val leftBlock = Duplicable.applyWithEnv(left) { env => () =>
-        parReduce(env)
+      val leftBlock = Spore(left) { () =>
+        parReduce(left)
       }
 
-      val rightBlock = Duplicable.applyWithEnv(right) { env => () =>
-        parReduce(env)
+      val rightBlock = Spore(right) { () =>
+        parReduce(right)
       }
 
       val leftFut =  safeFuture(leftBlock).flatten

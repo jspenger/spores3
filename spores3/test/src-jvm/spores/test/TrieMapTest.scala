@@ -1,12 +1,11 @@
 package spores.test
 
-import utest._
+import utest.*
 
 import scala.collection.concurrent.TrieMap
 
-import spores.default.*
-import spores.default.given
-import spores.conversions.given
+import spores.v03.*
+import spores.v03.given
 
 
 case class Customer(name: String, customerNo: Int)
@@ -23,7 +22,8 @@ object TrieMapTest extends TestSuite {
   val tests = Tests {
 
     test("test") {
-      val s = Duplicable.applyWithEnv[CustomerMap, List[Customer] => Float](customerData) { data => cs =>
+      val data = customerData
+      val s = Spore(data) { (cs: List[Customer]) =>
         val infos = cs.flatMap { c =>
           data.get(c.customerNo) match {
             case Some(info) => List(info)

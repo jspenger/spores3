@@ -253,5 +253,30 @@ object AutoCaptureTests extends TestSuite {
       val expected = 450 // (0 + 1 + ... + 9) * 5 * 2
       assert(expected == actual)
     }
+
+    test("testCaptureOuterMemberFromThis") {
+      class Outer {
+        val captureThisXIfYouCan = 99
+        def fun = Spore(*) { (x: Int) => x + captureThisXIfYouCan }
+      }
+      val outer = new Outer()
+      val fun = outer.fun
+      val unwrapped = writeReadUnwrap(fun)
+      assert(111 == unwrapped(12))
+    }
+
+    test("testCaptureOuterMemberFromNestedInner") {
+      class Outer {
+        val y = 12
+        class Inner {
+          def foo = Spore(*) { (x: Int) => x + y }
+        }
+      }
+      val outer = new Outer()
+      val inner = new outer.Inner()
+      val fun = inner.foo
+      val unwrapped = writeReadUnwrap(fun)
+      assert(42 == unwrapped(30))
+    }
   }
 }

@@ -172,6 +172,11 @@ object ReadWriters {
   }
   given tuple3RW[T1, T2, T3](using t1RW: Spore[ReadWriter[T1]], t2RW: Spore[ReadWriter[T2]], t3RW: Spore[ReadWriter[T3]]): Spore[ReadWriter[Tuple3[T1, T2, T3]]] = (new Tuple3RW[T1, T2, T3]).build().withCtx2(t1RW).withCtx2(t2RW).withCtx2(t3RW)
 
+  private[spores] class Tuple4RW[T1, T2, T3, T4] extends SporeClassBuilder[ReadWriter[T1] ?=> ReadWriter[T2] ?=> ReadWriter[T3] ?=> ReadWriter[T4] ?=> ReadWriter[Tuple4[T1, T2, T3, T4]]] {
+    override def body = summon
+  }
+  given tuple4RW[T1, T2, T3, T4](using t1RW: Spore[ReadWriter[T1]], t2RW: Spore[ReadWriter[T2]], t3RW: Spore[ReadWriter[T3]], t4RW: Spore[ReadWriter[T4]]): Spore[ReadWriter[Tuple4[T1, T2, T3, T4]]] = (new Tuple4RW[T1, T2, T3, T4]).build().withCtx2(t1RW).withCtx2(t2RW).withCtx2(t3RW).withCtx2(t4RW)
+
   private[spores] class EitherRW[Err, T] extends SporeClassBuilder[ReadWriter[Err] ?=> ReadWriter[T] ?=> ReadWriter[Either[Err, T]]] {
     override def body = summon
   }

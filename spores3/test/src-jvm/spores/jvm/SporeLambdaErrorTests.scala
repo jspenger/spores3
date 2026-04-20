@@ -80,18 +80,20 @@ object SporeLambdaErrorTests extends TestSuite {
           Invalid capture of `this` from outer class. Add it to the capture list or use `*` to capture all by default.
           """.trim()
 
-      assert:
-        typeCheckErrorMessages:
-          """
-          class Outer:
-            val x = 12
-            Spore.apply() { () => 42 * x }.get()
-          (new Outer())
-          """
-        .contains:
-          """
-          Invalid capture of `this` from class Outer. Add it to the capture list or use `*` to capture all by default.
-          """.trim()
+      // // This is now allowed. If the literal `this` is not not present, then
+      // // the member `x` is captured instead.
+      // assert:
+      //   typeCheckErrorMessages:
+      //     """
+      //     class Outer:
+      //       val x = 12
+      //       Spore.apply() { () => 42 * x }.get()
+      //     (new Outer())
+      //     """
+      //   .contains:
+      //     """
+      //     Invalid capture of `this` from class Outer. Add it to the capture list or use `*` to capture all by default.
+      //     """.trim()
     }
 
     test("testInvalidCaptureOfTopLevelMember") {
